@@ -9,6 +9,8 @@ class Ball : public Entity
 	Ball(EntityDetails details);
 
 	void Update(double, const InputManager& inputManager) override;
+	void ResolveCollision(const Entity&) override;
+
 	void AddForce(float forceX, float forceY);
 
 	private:

@@ -3,7 +3,10 @@
 #include "Ball.h"
 
 Level::Level()
-: m_EntityManager({2, 1, 250, 558, 2, 2}, {0, 0, 100, 100, 2, 2}) {}
+: m_EntityManager(
+{2, 1, Vector2(250, 558), Vector2(2, 2)}, 
+{0, 0, Vector2(100, 100), Vector2(2, 2)}
+) {}
 
 Level::~Level() {}
 
