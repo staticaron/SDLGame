@@ -18,6 +18,7 @@ class Level
 
 	void HandleCollisions();
 	void Update(double, const InputManager&);
+	void RenderImGui();
 	void Render(SDL_Renderer*, const TextureManager&);
 
 	private:

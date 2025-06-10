@@ -2,21 +2,34 @@
 
 Game::Game()
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
+	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER ) != 0 )
+	{
+		printf( "Error: %s\n", SDL_GetError() );
+		return;
+	}
 
-	m_Window = SDL_CreateWindow("SDL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI);
-	m_Renderer = SDL_CreateRenderer(m_Window, -1, 0);
+	m_Window = SDL_CreateWindow( "SDL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI );
+	m_Renderer = SDL_CreateRenderer( m_Window, -1, 0 );
 
-	SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 255);
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-	m_TextureManager.LoadAllTextures(m_Renderer);
+	ImGui::StyleColorsDark();
 
-	m_MainLevel.InitColliders(m_TextureManager);
+	ImGui_ImplSDL2_InitForSDLRenderer( m_Window, m_Renderer );
+	ImGui_ImplSDLRenderer2_Init( m_Renderer );
+
+	SDL_SetRenderDrawColor( m_Renderer, 0, 0, 0, 255 );
+
+	m_TextureManager.LoadAllTextures( m_Renderer );
+
+	m_MainLevel.InitColliders( m_TextureManager );
 }
 
 Game::~Game()
 {
-	SDL_DestroyRenderer(m_Renderer);
+	SDL_DestroyRenderer( m_Renderer );
 }
 
 void Game::Run()
@@ -25,50 +38,69 @@ void Game::Run()
 
 	SDL_Event event;
 
-	while (isRunning)
+	while( isRunning )
 	{
 		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
-		m_DeltaTime = (double)(NOW - LAST)*1000 / (double)SDL_GetPerformanceFrequency();
+		m_DeltaTime = (double)(NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency();
 
 		m_InputManager.InitProcessSession();
 
-		while (SDL_PollEvent(&event))
+		while( SDL_PollEvent( &event ) )
 		{
-			if (event.type == SDL_QUIT) {
+			ImGui_ImplSDL2_ProcessEvent(&event);
+
+			if( event.type == SDL_QUIT )
+			{
 				isRunning = false;
 				break;
 			}
 
-			m_InputManager.ProcessEvent(event);	
+			m_InputManager.ProcessEvent( event );
 		}
 
-		if(!isRunning) break;
+		if( !isRunning ) break;
 
-		Update(m_DeltaTime);
+		ImGui_ImplSDLRenderer2_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
+		Update( m_DeltaTime );
 		HandleCollisions();
+		RenderImGui();
 		Render();
 	}
 }
 
-void Game::Update(double deltaTime)
+void Game::Update( double deltaTime )
 {
-	m_MainLevel.Update(deltaTime, m_InputManager);
+	m_MainLevel.Update( deltaTime, m_InputManager );
 }
 
-void Game::HandleCollisions() 
+void Game::HandleCollisions()
 {
 	m_MainLevel.HandleCollisions();
 }
 
+void Game::RenderImGui()
+{
+	m_MainLevel.RenderImGui();
+}
+
 void Game::Render()
 {
-	SDL_RenderClear(m_Renderer);
+	ImGui::Render();
 
+	SDL_RenderClear( m_Renderer );
+
+	// Rendering Background
 	SDL_Rect bgRect = { 0, 0, 800, 600 };
-	SDL_RenderCopy(m_Renderer, m_TextureManager.GetTexture(-1).texture, NULL, &bgRect);
+	SDL_RenderCopy( m_Renderer, m_TextureManager.GetTexture( -1 ).texture, NULL, &bgRect );
 
-	m_MainLevel.Render(m_Renderer, m_TextureManager);
+	// Rendering the level contents
+	m_MainLevel.Render( m_Renderer, m_TextureManager );
 
-	SDL_RenderPresent(m_Renderer);
+	ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
+
+	SDL_RenderPresent( m_Renderer );
 }

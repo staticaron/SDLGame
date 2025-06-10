@@ -4,8 +4,8 @@
 
 Level::Level()
 : m_EntityManager(
-{2, 1, Vector2(250, 558), Vector2(2, 2)}, 
-{0, 0, Vector2(100, 100), Vector2(2, 2)}
+{2, 1, glm::vec2(250, 558), glm::vec2(2, 2)}, 
+{0, 0, glm::vec2(300, 100), glm::vec2(2, 2)}
 ) {}
 
 Level::~Level() {}
@@ -35,6 +35,12 @@ void Level::Update(double deltaTime, const InputManager& inputManager)
 {
 	m_EntityManager.GetBat().Update(deltaTime, inputManager);
 	m_EntityManager.GetBall().Update(deltaTime, inputManager);
+}
+
+void Level::RenderImGui()
+{
+	m_EntityManager.GetBall().RenderImGui();
+	m_EntityManager.GetBat().RenderImGui();
 }
 
 void Level::Render(SDL_Renderer* renderer, const TextureManager& textureManager)

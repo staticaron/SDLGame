@@ -1,6 +1,9 @@
 #pragma once
 
 #include "SDL/SDL.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl2.h"
+#include "imgui/imgui_impl_sdlrenderer2.h"
 
 #include "Level.h"
 #include "managers/TextureManager.h"
@@ -28,5 +31,6 @@ class Game {
 
 	void Update(double);
 	void HandleCollisions();
+	void RenderImGui();
 	void Render();
 };

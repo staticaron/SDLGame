@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
 #include <functional>
+#include <vector>
 
-#include "../Bat.h"
 #include "../Ball.h"
+#include "../Bat.h"
 
 class EntityManager 
 {

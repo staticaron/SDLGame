@@ -12,5 +12,5 @@ class Bat : public Entity
 	private:
 	int paddingX = 10;
 
-	void MaintainBounds();
+	void MaintainBounds() override;
 };

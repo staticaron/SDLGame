@@ -1,67 +1,101 @@
 #include <iostream>
 
-#include "Entity.h"
 #include "SDL/SDL_image.h"
+#include "Entity.h"
+#include "imgui/imgui.h"
 
-Entity::Entity(EntityType type, EntityDetails details) 
-: m_EntityDetails(details), m_Type(type)
+
+Entity::Entity( EntityType type, EntityDetails details )
+	: m_EntityDetails( details ), m_Type( type )
 {
-	
+
 }
 
 Entity::~Entity() {}
 
-void Entity::InitColliders(const TextureManager& textureManager)
+void Entity::InitColliders( const TextureManager& textureManager )
 {
-	m_EntityBounds = EntityBounds(textureManager, m_EntityDetails);
+	m_EntityBounds = EntityBounds( textureManager, m_EntityDetails );
 }
 
-void Entity::Update(double deltaTime, const InputManager& inputManager) {}
+void Entity::Update( double deltaTime, const InputManager& inputManager ) {}
 
-void Entity::Render(SDL_Renderer* renderer, const TextureManager& textureManager) const
+void Entity::HandleCollisions( const Entity& entity )
 {
-	SDL_Rect rect = {m_EntityDetails.pos.x, m_EntityDetails.pos.y, m_EntityBounds.width, m_EntityBounds.height};
-	SDL_RenderCopy(renderer, textureManager.GetTexture(m_EntityDetails.textureIndex).texture, NULL, &rect);
-}
+	m_CollisionAndOverlap = DetectCollision( entity );
 
-bool Entity::DetectCollision(const Entity& entity) const
-{
-	for (auto& x : GetBoundPoints()) 
+	if( m_CollisionAndOverlap.IsColliding() && m_Type == BALL )
 	{
-		bool isXOverlap = x.x >= entity.m_EntityDetails.pos.x && x.x <= entity.m_EntityDetails.pos.x + entity.m_EntityBounds.width;
-		bool isYOverlap = x.y >= entity.m_EntityDetails.pos.y && x.y <= entity.m_EntityDetails.pos.y + entity.m_EntityBounds.height;
-
-		if(isXOverlap && isYOverlap) return true;
-	}
-
-	return false;
-}
-
-void Entity::ResolveCollision(const Entity& entity)
-{
-	std::cout << "Collision Resolution Not Implemented!" << std::endl;
-}
-
-void Entity::HandleCollisions(const Entity& entity)
-{
-	if (DetectCollision(entity) && m_Type == BALL)
-	{
-		ResolveCollision(entity);
+		ResolveCollision( entity );
 	}
 }
 
-std::array<Vector2, 4> Entity::GetBoundPoints() const
+void Entity::RenderImGui()
 {
-	return 
+	auto min = m_EntityDetails.pos;
+	auto max = m_EntityDetails.pos + m_EntityBounds.bounds;
+	auto middle = m_EntityDetails.pos + m_EntityBounds.GetHalfBounds();
+
+	ImGui::GetForegroundDrawList()->AddRect( { min.x, min.y }, { max.x, max.y }, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
+	ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32(255, 0, 0, 255));
+
+	if( m_Type == BALL )
 	{
-		Vector2(m_EntityDetails.pos.x, m_EntityDetails.pos.y), 
-		Vector2(m_EntityDetails.pos.x + m_EntityBounds.width, m_EntityDetails.pos.y),
-		Vector2(m_EntityDetails.pos.x + m_EntityBounds.width, m_EntityDetails.pos.y + m_EntityBounds.height),
-		Vector2(m_EntityDetails.pos.x, m_EntityDetails.pos.y + m_EntityBounds.height)
+		float maxArr[2] = {max.x, max.y};
+
+		ImGui::Begin( "Ball Settings" );
+		ImGui::InputFloat2("Max Point", maxArr);
+		ImGui::End();
+	}
+}
+
+void Entity::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) const
+{
+	SDL_Rect rect = { m_EntityDetails.pos.x, m_EntityDetails.pos.y, m_EntityBounds.bounds.x, m_EntityBounds.bounds.y };
+	SDL_RenderCopy( renderer, textureManager.GetTexture( m_EntityDetails.textureIndex ).texture, NULL, &rect );
+}
+
+AxisOverlap Entity::DetectCollision( const Entity& entity ) const
+{
+	AxisOverlap overlap;
+
+	overlap.xOverlap = ! ( GetBoundPoint(TOPRIGHT).x < entity.GetBoundPoint(TOPLEFT).x ) && ! ( GetBoundPoint(TOPLEFT).x > entity.GetBoundPoint(TOPRIGHT).x );
+	overlap.yOverlap = ! ( GetBoundPoint(TOPRIGHT).y > entity.GetBoundPoint(BOTTOMRIGHT).y ) && ! ( GetBoundPoint(BOTTOMRIGHT).y < entity.GetBoundPoint(TOPRIGHT).y );
+
+	if( overlap.IsColliding() )
+	{
+		glm::vec2 delta = GetCenter() - entity.GetCenter();
+
+		overlap.overlapAmount = {
+			m_EntityBounds.GetHalfBounds().x + entity.m_EntityBounds.GetHalfBounds().x - glm::abs( delta.x ),
+			m_EntityBounds.GetHalfBounds().y + entity.m_EntityBounds.GetHalfBounds().y - glm::abs( delta.y )
+		};
+	}
+
+	return overlap;
+}
+
+void Entity::ResolveCollision( const Entity& entity ) {}
+
+void Entity::MaintainBounds() {}
+
+std::array<glm::vec2, 4> Entity::GetBoundPoints() const
+{
+	return
+	{
+		glm::vec2( m_EntityDetails.pos.x, m_EntityDetails.pos.y ),
+		glm::vec2( m_EntityDetails.pos.x + m_EntityBounds.bounds.x, m_EntityDetails.pos.y ),
+		glm::vec2( m_EntityDetails.pos.x + m_EntityBounds.bounds.x, m_EntityDetails.pos.y + m_EntityBounds.bounds.y ),
+		glm::vec2( m_EntityDetails.pos.x, m_EntityDetails.pos.y + m_EntityBounds.bounds.y )
 	};
 }
 
-Vector2 Entity::GetBoundPoint(BoundPointType type) const
+glm::vec2 Entity::GetBoundPoint( BoundPointType type ) const
 {
-	return Vector2(m_EntityDetails.pos.x + (type == TOPRIGHT || type == BOTTOMRIGHT ? m_EntityBounds.width : 0), m_EntityDetails.pos.y + (type == BOTTOMRIGHT || type == BOTTOMLEFT ? m_EntityBounds.height : 0));
+	return glm::vec2( m_EntityDetails.pos.x + (type == TOPRIGHT || type == BOTTOMRIGHT ? m_EntityBounds.bounds.x : 0), m_EntityDetails.pos.y + (type == BOTTOMRIGHT || type == BOTTOMLEFT ? m_EntityBounds.bounds.y : 0) );
+}
+
+glm::vec2 Entity::GetCenter() const
+{
+	return glm::vec2( m_EntityDetails.pos + m_EntityBounds.bounds * 0.5f );
 }
