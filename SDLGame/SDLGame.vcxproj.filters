@@ -78,6 +78,21 @@
     <ClCompile Include="Include\imgui\imgui_impl_sdlrenderer2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="managers\ScoreManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="managers\FontManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\inih\INIReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Include\inih\ini.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="managers\config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\SDL\begin_code.h">
@@ -1256,6 +1271,21 @@
     <ClInclude Include="Include\imgui\imgui_impl_sdlrenderer2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="managers\ScoreManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="managers\FontManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="managers\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\inih\INIReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\inih\ini.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\x86\SDL2.lib">
@@ -1758,6 +1788,8 @@
     <None Include="Include\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="imgui.ini" />
+    <None Include="config.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\tex1.png">
@@ -1766,5 +1798,23 @@
     <Image Include="textures\tex2.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\textures\ball.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\bat.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\tex1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\textures\tex2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\mightysouly.ttf" />
   </ItemGroup>
 </Project>

@@ -21,12 +21,12 @@ class TextureManager
 	const TextureContainer& GetTexture(int index) const;
 
 	private:
-	std::string m_BgTexturePath = "textures/bg.png";
+	std::string m_BgTexturePath = "assets/textures/bg.png";
 
 	std::vector<std::string> m_TexturePaths = {
-		"textures/ball.png",
-		"textures/tex2.png",
-		"textures/bat.png",
+		"assets/textures/ball.png",
+		"assets/textures/tex2.png",
+		"assets/textures/bat.png",
 	};
 
 	std::map<int, TextureContainer> m_Textures;

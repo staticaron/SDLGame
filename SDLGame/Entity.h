@@ -3,6 +3,7 @@
 #include <array>
 #include <SDL/SDL.h>
 #include <string>
+#include <functional>
 
 #include "glm/glm.hpp"
 #include "managers/InputManager.h"
@@ -64,7 +65,7 @@ public:
 	virtual void InitColliders( const TextureManager& );
 
 	virtual void Update( double, const InputManager& );
-	virtual void HandleCollisions( const Entity& );
+	virtual void HandleCollisions( const Entity&, std::function<void(int)> );
 	virtual void RenderImGui();
 	virtual void Render( SDL_Renderer* renderer, const TextureManager& ) const;
 
@@ -80,6 +81,7 @@ public:
 
 protected:
 	EntityType m_Type;
+	bool m_ShowBounds = true;
 
 	AxisOverlap m_CollisionAndOverlap;
 	AxisOverlap m_PreviousCollisionAndOverlap;

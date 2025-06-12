@@ -5,8 +5,10 @@
 
 #include "Entity.h"
 #include "managers/TextureManager.h"
+#include "managers/FontManager.h"
 #include "managers/InputManager.h"
 #include "managers/EntityManager.h"
+#include "managers/ScoreManager.h"
 
 class Level 
 {
@@ -16,11 +18,18 @@ class Level
 
 	void InitColliders(const TextureManager&);
 
+	void UpdateScore(int deltaScore);
+
 	void HandleCollisions();
 	void Update(double, const InputManager&);
 	void RenderImGui();
 	void Render(SDL_Renderer*, const TextureManager&);
 
+	void RenderUI(SDL_Renderer*, const FontManager&);
+
 	private:
 	EntityManager m_EntityManager;
+	ScoreManager m_ScoreManager;
+
+	int m_PreviousScore = -1;
 };

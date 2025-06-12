@@ -8,6 +8,8 @@
 #include "Level.h"
 #include "managers/TextureManager.h"
 #include "managers/InputManager.h"
+#include "managers/ScoreManager.h"
+#include "managers/FontManager.h"
 
 class Game {
 	public:
@@ -21,16 +23,20 @@ class Game {
 	SDL_Renderer* m_Renderer;
 
 	TextureManager m_TextureManager;
+	FontManager m_FontManager;
 	InputManager m_InputManager;
+	ScoreManager m_ScoreManager;
 
-	Level m_MainLevel = Level();
+	Level m_MainLevel;
 
 	Uint64 NOW = SDL_GetPerformanceCounter();
 	Uint64 LAST = 0;
 	double m_DeltaTime = 0;
+	bool m_ShowImGui = true;
 
 	void Update(double);
 	void HandleCollisions();
 	void RenderImGui();
-	void Render();
+	void RenderEverything();
+	void RenderUI();
 };

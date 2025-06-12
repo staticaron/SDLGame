@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{89d0bcb2-29fb-4a20-bd68-752bd204764c}</ProjectGuid>
     <RootNamespace>SDLGame</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,6 +106,7 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -163,11 +165,16 @@
     <ClCompile Include="Include\imgui\imgui_impl_sdlrenderer2.cpp" />
     <ClCompile Include="Include\imgui\imgui_tables.cpp" />
     <ClCompile Include="Include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Include\inih\ini.c" />
+    <ClCompile Include="Include\inih\INIReader.cpp" />
+    <ClCompile Include="managers\config.cpp" />
     <ClCompile Include="managers\EntityManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="managers\FontManager.cpp" />
     <ClCompile Include="managers\InputManager.cpp" />
+    <ClCompile Include="managers\ScoreManager.cpp" />
     <ClCompile Include="managers\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -470,6 +477,9 @@
     <ClInclude Include="Include\imgui\imstb_rectpack.h" />
     <ClInclude Include="Include\imgui\imstb_textedit.h" />
     <ClInclude Include="Include\imgui\imstb_truetype.h" />
+    <ClInclude Include="Include\inih\ini.h" />
+    <ClInclude Include="Include\inih\INIReader.h" />
+    <ClInclude Include="managers\config.h" />
     <ClInclude Include="managers\EntityManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Include\SDL\SDL_image.h" />
@@ -561,10 +571,14 @@
     <ClInclude Include="Include\SDL\SDL_video.h" />
     <ClInclude Include="Include\SDL\SDL_vulkan.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="managers\FontManager.h" />
     <ClInclude Include="managers\InputManager.h" />
+    <ClInclude Include="managers\ScoreManager.h" />
     <ClInclude Include="managers\TextureManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="config.ini" />
+    <None Include="imgui.ini" />
     <None Include="Include\glm\detail\func_common.inl" />
     <None Include="Include\glm\detail\func_common_simd.inl" />
     <None Include="Include\glm\detail\func_exponential.inl" />
@@ -735,8 +749,16 @@
     <Library Include="Lib\x86\SDL2_image.lib" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\textures\ball.png" />
+    <Image Include="assets\textures\bat.png" />
+    <Image Include="assets\textures\bg.png" />
+    <Image Include="assets\textures\tex1.png" />
+    <Image Include="assets\textures\tex2.png" />
     <Image Include="textures\tex1.png" />
     <Image Include="textures\tex2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\mightysouly.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

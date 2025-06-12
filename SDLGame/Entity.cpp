@@ -20,33 +20,41 @@ void Entity::InitColliders( const TextureManager& textureManager )
 
 void Entity::Update( double deltaTime, const InputManager& inputManager ) {}
 
-void Entity::HandleCollisions( const Entity& entity )
+void Entity::HandleCollisions( const Entity& entity, std::function<void(int)> updateScoreFunc)
 {
 	m_CollisionAndOverlap = DetectCollision( entity );
 
-	if( m_CollisionAndOverlap.IsColliding() && m_Type == BALL )
+	// Game Over logic : if(m_EntityDetails.pos.x + m_EntityBounds.bounds.y > 589 ) updateScoreFunc();
+
+	if( m_CollisionAndOverlap.IsColliding() && GetType() == BALL )
 	{
+		if( entity.GetType() == BAT ) updateScoreFunc( 1 );
+
 		ResolveCollision( entity );
 	}
 }
 
 void Entity::RenderImGui()
 {
-	auto min = m_EntityDetails.pos;
-	auto max = m_EntityDetails.pos + m_EntityBounds.bounds;
-	auto middle = m_EntityDetails.pos + m_EntityBounds.GetHalfBounds();
-
-	ImGui::GetForegroundDrawList()->AddRect( { min.x, min.y }, { max.x, max.y }, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
-	ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32(255, 0, 0, 255));
-
-	if( m_Type == BALL )
+	if( m_ShowBounds )
 	{
-		float maxArr[2] = {max.x, max.y};
+		auto min = m_EntityDetails.pos;
+		auto max = m_EntityDetails.pos + m_EntityBounds.bounds;
+		auto middle = m_EntityDetails.pos + m_EntityBounds.GetHalfBounds();
 
-		ImGui::Begin( "Ball Settings" );
-		ImGui::InputFloat2("Max Point", maxArr);
-		ImGui::End();
+		ImGui::GetForegroundDrawList()->AddRect( { min.x, min.y }, { max.x, max.y }, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
+		ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32( 255, 0, 0, 255 ) );
 	}
+
+	float maxArr[2] = { GetCenter().x, GetCenter().y };
+
+	std::string windowTitle = m_Type == BALL ? "Ball" : "Bat";
+	windowTitle += " Settings";
+
+	ImGui::Begin( windowTitle.c_str() );
+	ImGui::InputFloat2( "Max Point", maxArr );
+	ImGui::Checkbox( "Show Bounds", &m_ShowBounds );
+	ImGui::End();
 }
 
 void Entity::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) const
@@ -59,8 +67,8 @@ AxisOverlap Entity::DetectCollision( const Entity& entity ) const
 {
 	AxisOverlap overlap;
 
-	overlap.xOverlap = ! ( GetBoundPoint(TOPRIGHT).x < entity.GetBoundPoint(TOPLEFT).x ) && ! ( GetBoundPoint(TOPLEFT).x > entity.GetBoundPoint(TOPRIGHT).x );
-	overlap.yOverlap = ! ( GetBoundPoint(TOPRIGHT).y > entity.GetBoundPoint(BOTTOMRIGHT).y ) && ! ( GetBoundPoint(BOTTOMRIGHT).y < entity.GetBoundPoint(TOPRIGHT).y );
+	overlap.xOverlap = !(GetBoundPoint( TOPRIGHT ).x < entity.GetBoundPoint( TOPLEFT ).x) && !(GetBoundPoint( TOPLEFT ).x > entity.GetBoundPoint( TOPRIGHT ).x);
+	overlap.yOverlap = !(GetBoundPoint( TOPRIGHT ).y > entity.GetBoundPoint( BOTTOMRIGHT ).y) && !(GetBoundPoint( BOTTOMRIGHT ).y < entity.GetBoundPoint( TOPRIGHT ).y);
 
 	if( overlap.IsColliding() )
 	{
