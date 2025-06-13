@@ -3,7 +3,7 @@
 #include "SDL/SDL_image.h"
 #include "Entity.h"
 #include "imgui/imgui.h"
-
+#include "managers/config.h"
 
 Entity::Entity( EntityType type, EntityDetails details )
 	: m_EntityDetails( details ), m_Type( type )
@@ -20,18 +20,17 @@ void Entity::InitColliders( const TextureManager& textureManager )
 
 void Entity::Update( double deltaTime, const InputManager& inputManager ) {}
 
-void Entity::HandleCollisions( const Entity& entity, std::function<void(int)> updateScoreFunc)
+bool Entity::HandleCollisions( const Entity& entity, std::function<void(int)> updateScoreFunc)
 {
 	m_CollisionAndOverlap = DetectCollision( entity );
-
-	// Game Over logic : if(m_EntityDetails.pos.x + m_EntityBounds.bounds.y > 589 ) updateScoreFunc();
 
 	if( m_CollisionAndOverlap.IsColliding() && GetType() == BALL )
 	{
 		if( entity.GetType() == BAT ) updateScoreFunc( 1 );
-
 		ResolveCollision( entity );
 	}
+
+	return m_CollisionAndOverlap.isGrounded;
 }
 
 void Entity::RenderImGui()
@@ -79,6 +78,8 @@ AxisOverlap Entity::DetectCollision( const Entity& entity ) const
 			m_EntityBounds.GetHalfBounds().y + entity.m_EntityBounds.GetHalfBounds().y - glm::abs( delta.y )
 		};
 	}
+
+	overlap.isGrounded = GetBoundPoint(BOTTOMRIGHT).y >= Config::GetWindowSize().y - Config::GetWindowPadding();
 
 	return overlap;
 }

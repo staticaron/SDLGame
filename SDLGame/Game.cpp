@@ -74,6 +74,12 @@ void Game::Run()
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
+		if(m_MainLevel.IsGameOver()) 
+		{
+			// Game Over. Load the Game Over Level
+			// m_MainLevel = gameOverLevel;
+		}
+
 		Update( m_DeltaTime );
 		HandleCollisions();
 		RenderImGui();

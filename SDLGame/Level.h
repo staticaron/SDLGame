@@ -27,9 +27,13 @@ class Level
 
 	void RenderUI(SDL_Renderer*, const FontManager&);
 
+	bool IsGameOver(){ return m_IsGameOver; }
+
 	private:
 	EntityManager m_EntityManager;
 	ScoreManager m_ScoreManager;
 
 	int m_PreviousScore = -1;
+
+	bool m_IsGameOver = false;
 };

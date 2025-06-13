@@ -33,7 +33,13 @@ void Level::HandleCollisions()
 
 			auto updateScoreFunc = std::bind(&ScoreManager::AddScore, &m_ScoreManager, std::placeholders::_1 );
 
-			entities[x].get().HandleCollisions(entities[y], updateScoreFunc);
+			bool isGrounded = entities[x].get().HandleCollisions(entities[y], updateScoreFunc);
+
+			if(entities[x].get().GetType() == BALL && isGrounded)
+			{ 
+				m_IsGameOver = true;
+				break;
+			}
 		}
 	}
 }

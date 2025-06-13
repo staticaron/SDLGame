@@ -38,6 +38,7 @@ struct AxisOverlap
 {
 	bool xOverlap, yOverlap = false;
 	glm::vec2 overlapAmount = { -1, -1 };
+	bool isGrounded = false;
 
 	bool IsColliding() { return xOverlap && yOverlap; }
 };
@@ -65,7 +66,7 @@ public:
 	virtual void InitColliders( const TextureManager& );
 
 	virtual void Update( double, const InputManager& );
-	virtual void HandleCollisions( const Entity&, std::function<void(int)> );
+	virtual bool HandleCollisions( const Entity&, std::function<void(int)> );
 	virtual void RenderImGui();
 	virtual void Render( SDL_Renderer* renderer, const TextureManager& ) const;
 
