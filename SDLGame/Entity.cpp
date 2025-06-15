@@ -1,12 +1,14 @@
 #include <iostream>
 
 #include "SDL/SDL_image.h"
-#include "Entity.h"
 #include "imgui/imgui.h"
+
 #include "managers/config.h"
+#include "managers/AudioManager.h"
+#include "Entity.h"
 
 Entity::Entity( EntityType type, EntityDetails details )
-	: m_EntityDetails( details ), m_Type( type )
+	: m_EntityDetails( details ), m_Type( type ), m_InitialDetails( details )
 {
 
 }
@@ -20,17 +22,17 @@ void Entity::InitColliders( const TextureManager& textureManager )
 
 void Entity::Update( double deltaTime, const InputManager& inputManager ) {}
 
-bool Entity::HandleCollisions( const Entity& entity, std::function<void(int)> updateScoreFunc)
+void Entity::HandleCollisions( const Entity& entity, std::function<void(int)> updateScoreFunc)
 {
 	m_CollisionAndOverlap = DetectCollision( entity );
 
 	if( m_CollisionAndOverlap.IsColliding() && GetType() == BALL )
 	{
+		AudioManager::Get().PlaySound(0, 1);
+
 		if( entity.GetType() == BAT ) updateScoreFunc( 1 );
 		ResolveCollision( entity );
 	}
-
-	return m_CollisionAndOverlap.isGrounded;
 }
 
 void Entity::RenderImGui()
@@ -45,7 +47,7 @@ void Entity::RenderImGui()
 		ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32( 255, 0, 0, 255 ) );
 	}
 
-	float maxArr[2] = { GetCenter().x, GetCenter().y };
+	float maxArr[2] = { GetBoundPoint(BOTTOMRIGHT).x, GetBoundPoint(BOTTOMRIGHT).y };
 
 	std::string windowTitle = m_Type == BALL ? "Ball" : "Bat";
 	windowTitle += " Settings";
@@ -53,6 +55,9 @@ void Entity::RenderImGui()
 	ImGui::Begin( windowTitle.c_str() );
 	ImGui::InputFloat2( "Max Point", maxArr );
 	ImGui::Checkbox( "Show Bounds", &m_ShowBounds );
+	ImGui::BeginDisabled();
+	ImGui::Checkbox("IsGrounded", &m_IsGrounded);
+	ImGui::EndDisabled();
 	ImGui::End();
 }
 
@@ -79,14 +84,22 @@ AxisOverlap Entity::DetectCollision( const Entity& entity ) const
 		};
 	}
 
-	overlap.isGrounded = GetBoundPoint(BOTTOMRIGHT).y >= Config::GetWindowSize().y - Config::GetWindowPadding();
-
 	return overlap;
 }
 
 void Entity::ResolveCollision( const Entity& entity ) {}
 
 void Entity::MaintainBounds() {}
+
+void Entity::ResetDetails()
+{
+	m_EntityDetails = m_InitialDetails;
+}
+
+void Entity::GroundCheck()
+{
+	m_IsGrounded = GetBoundPoint(BOTTOMRIGHT).y >= Config::GetWindowSize().y - Config::GetWindowPadding();
+}
 
 std::array<glm::vec2, 4> Entity::GetBoundPoints() const
 {

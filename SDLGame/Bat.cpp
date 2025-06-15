@@ -9,6 +9,10 @@ Bat::Bat( EntityDetails details )
 
 void Bat::Update( double deltaTime, const InputManager& inputManager )
 {
+	if( m_IsStatic ) return;
+
+	GroundCheck();
+
 	m_PreviousEntityDetails = m_EntityDetails;
 
 	m_EntityDetails.pos.x += inputManager.m_HorizontalAxis * m_EntityDetails.moveSpeed * deltaTime;

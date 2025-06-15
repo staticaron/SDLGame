@@ -18,14 +18,13 @@ class Level
 
 	void InitColliders(const TextureManager&);
 
-	void UpdateScore(int deltaScore);
-
 	void HandleCollisions();
-	void Update(double, const InputManager&);
+	bool Update(double, const InputManager&);
 	void RenderImGui();
 	void Render(SDL_Renderer*, const TextureManager&);
 
 	void RenderUI(SDL_Renderer*, const FontManager&);
+	void RestartLevel();
 
 	bool IsGameOver(){ return m_IsGameOver; }
 
@@ -33,7 +32,11 @@ class Level
 	EntityManager m_EntityManager;
 	ScoreManager m_ScoreManager;
 
-	int m_PreviousScore = -1;
+	float m_Timer = 5.0f;
+	float m_CurrentTimer = m_Timer;
 
 	bool m_IsGameOver = false;
+
+	void RenderScore( const FontManager& fontManager, SDL_Renderer* renderer );
+	void RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer );
 };

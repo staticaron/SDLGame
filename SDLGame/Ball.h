@@ -14,6 +14,9 @@ public:
 	void ResolveCollision( const Entity& ) override;
 	void MaintainBounds() override;
 
+	void ResetDetails() override;
+	void RenderImGui() override;
+
 	void AddForce( glm::vec2 force );
 
 private:

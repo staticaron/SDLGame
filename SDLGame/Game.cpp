@@ -1,6 +1,9 @@
 #include "Game.h"
 
+#include <chrono>
+
 #include "managers/config.h"
+#include "managers/AudioManager.h"
 
 Game::Game()
 {
@@ -12,7 +15,7 @@ Game::Game()
 		return;
 	}
 
-	m_Window = SDL_CreateWindow( "SDL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Config::GetWindowSize().x, Config::GetWindowSize().y, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI);
+	m_Window = SDL_CreateWindow( "SDL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Config::GetWindowSize().x, Config::GetWindowSize().y, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI );
 	m_Renderer = SDL_CreateRenderer( m_Window, -1, 0 );
 
 	IMGUI_CHECKVERSION();
@@ -27,6 +30,9 @@ Game::Game()
 	SDL_SetRenderDrawColor( m_Renderer, 0, 0, 0, 255 );
 
 	m_TextureManager.LoadAllTextures( m_Renderer );
+
+	AudioManager::Get().Init();
+	AudioManager::Get().PlayMusic( 0, -1 );
 
 	m_MainLevel.InitColliders( m_TextureManager );
 }
@@ -44,9 +50,9 @@ void Game::Run()
 
 	while( isRunning )
 	{
-		LAST = NOW;
 		NOW = SDL_GetPerformanceCounter();
-		m_DeltaTime = (double)(NOW - LAST) * 1000 / (double)SDL_GetPerformanceFrequency();
+		m_DeltaTime = (double)(NOW - LAST) / (double)SDL_GetPerformanceFrequency();
+		LAST = NOW;
 
 		m_InputManager.InitProcessSession();
 
@@ -74,22 +80,20 @@ void Game::Run()
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		if(m_MainLevel.IsGameOver()) 
-		{
-			// Game Over. Load the Game Over Level
-			// m_MainLevel = gameOverLevel;
+		if( !Update( m_DeltaTime ) ) {
+			m_MainLevel.RestartLevel();
+			m_MainLevel.Update( m_DeltaTime, m_InputManager );
 		}
 
-		Update( m_DeltaTime );
 		HandleCollisions();
 		RenderImGui();
 		RenderEverything();
 	}
 }
 
-void Game::Update( double deltaTime )
+bool Game::Update( double deltaTime )
 {
-	m_MainLevel.Update( deltaTime, m_InputManager );
+	return m_MainLevel.Update( deltaTime, m_InputManager );
 }
 
 void Game::HandleCollisions()
@@ -100,6 +104,18 @@ void Game::HandleCollisions()
 void Game::RenderImGui()
 {
 	if( !m_ShowImGui ) return;
+
+	ImGui::Begin( "Game Settings" );
+	ImGui::SliderFloat( "Music Volume", &m_MasterVolume, 0.0f, 1.0f );
+	ImGui::SliderFloat( "SFX Volume ", &m_MasterSfxVolume, 0.0f, 1.0f);
+	if( ImGui::Button( "SET" ) )
+	{
+		AudioManager::Get().SetMusicVolume( m_MasterVolume );
+		AudioManager::Get().SetSoundVolume( -1, m_MasterSfxVolume );
+	}
+	ImGui::InputDouble( "Delta Time", &m_DeltaTime);
+	ImGui::End();
+
 	m_MainLevel.RenderImGui();
 }
 
@@ -124,4 +140,4 @@ void Game::RenderEverything()
 	SDL_RenderPresent( m_Renderer );
 }
 
-void Game::RenderUI(){ m_MainLevel.RenderUI(m_Renderer, m_FontManager); }
+void Game::RenderUI() { m_MainLevel.RenderUI( m_Renderer, m_FontManager ); }

@@ -38,7 +38,6 @@ struct AxisOverlap
 {
 	bool xOverlap, yOverlap = false;
 	glm::vec2 overlapAmount = { -1, -1 };
-	bool isGrounded = false;
 
 	bool IsColliding() { return xOverlap && yOverlap; }
 };
@@ -66,23 +65,36 @@ public:
 	virtual void InitColliders( const TextureManager& );
 
 	virtual void Update( double, const InputManager& );
-	virtual bool HandleCollisions( const Entity&, std::function<void(int)> );
-	virtual void RenderImGui();
+	virtual void HandleCollisions( const Entity&, std::function<void( int )> );
 	virtual void Render( SDL_Renderer* renderer, const TextureManager& ) const;
+	virtual void RenderImGui();
 
 	AxisOverlap DetectCollision( const Entity& entity ) const;
 	virtual void ResolveCollision( const Entity& );
 	virtual void MaintainBounds();
 
+	virtual void ResetDetails();
+	virtual void GroundCheck();
+
+
 	// Getters and Setters
 	std::array<glm::vec2, 4> GetBoundPoints() const;
 	glm::vec2 GetBoundPoint( BoundPointType type ) const;
-	EntityType GetType() const { return m_Type; }
 	glm::vec2 GetCenter() const;
+	EntityType GetType() const { return m_Type; }
+	bool IsGrounded() const { return m_IsGrounded; }
+
+	void MakeStatic() { m_IsStatic = true; }
+	void MakeDynamic() { m_IsStatic = false; }
 
 protected:
 	EntityType m_Type;
 	bool m_ShowBounds = true;
+	bool m_IsGrounded = false;
+
+	bool m_IsStatic = false;
+
+	EntityDetails m_InitialDetails;
 
 	AxisOverlap m_CollisionAndOverlap;
 	AxisOverlap m_PreviousCollisionAndOverlap;

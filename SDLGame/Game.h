@@ -29,12 +29,16 @@ class Game {
 
 	Level m_MainLevel;
 
-	Uint64 NOW = SDL_GetPerformanceCounter();
-	Uint64 LAST = 0;
+	Uint64 NOW = 0;
+	Uint64 LAST = SDL_GetPerformanceCounter();;
 	double m_DeltaTime = 0;
+
 	bool m_ShowImGui = true;
 
-	void Update(double);
+	float m_MasterVolume = 0.5f;
+	float m_MasterSfxVolume = 0.5f;
+
+	bool Update(double);
 	void HandleCollisions();
 	void RenderImGui();
 	void RenderEverything();
