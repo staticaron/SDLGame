@@ -32,9 +32,12 @@ Game::Game()
 	m_TextureManager.LoadAllTextures( m_Renderer );
 
 	AudioManager::Get().Init();
-	AudioManager::Get().PlayMusic( 0, -1 );
+	AudioManager::Get().PlayMusic( 0 );
 
-	m_MainLevel.InitColliders( m_TextureManager );
+	// m_CurrentLevel = std::make_unique<Level>();
+	m_MainMenuLevel = std::make_unique<MainMenu>();
+
+	// m_CurrentLevel->InitColliders( m_TextureManager );
 }
 
 Game::~Game()
@@ -80,25 +83,51 @@ void Game::Run()
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		if( !Update( m_DeltaTime ) ) {
-			m_MainLevel.RestartLevel();
-			m_MainLevel.Update( m_DeltaTime, m_InputManager );
+		if( m_CurrentGameState == LEVEL )
+		{
+			Update( m_DeltaTime );
+			if( m_CurrentLevel->IsGameOver() )
+			{
+				m_CurrentLevel->RestartLevel();
+				m_CurrentLevel->Update( m_DeltaTime, m_InputManager );
+			}
+			HandleCollisions();
+			RenderImGui();
+			RenderEverything();
 		}
+		else
+		{
+			m_MainMenuLevel->Update( m_DeltaTime, m_InputManager );
 
-		HandleCollisions();
-		RenderImGui();
-		RenderEverything();
+			if( m_MainMenuLevel->GetQuitStatus() ) break;
+
+			m_MainMenuLevel->RenderImGui( m_Renderer );
+
+			ImGui::Render();
+
+			SDL_RenderClear( m_Renderer );
+
+			// Rendering the level contents
+			m_MainMenuLevel->Render( m_Renderer, m_TextureManager );
+
+			// Render the Level UI
+			m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager );
+
+			ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
+
+			SDL_RenderPresent( m_Renderer );
+		}
 	}
 }
 
-bool Game::Update( double deltaTime )
+void Game::Update( double deltaTime )
 {
-	return m_MainLevel.Update( deltaTime, m_InputManager );
+	m_CurrentLevel->Update( deltaTime, m_InputManager );
 }
 
 void Game::HandleCollisions()
 {
-	m_MainLevel.HandleCollisions();
+	m_CurrentLevel->HandleCollisions();
 }
 
 void Game::RenderImGui()
@@ -107,16 +136,16 @@ void Game::RenderImGui()
 
 	ImGui::Begin( "Game Settings" );
 	ImGui::SliderFloat( "Music Volume", &m_MasterVolume, 0.0f, 1.0f );
-	ImGui::SliderFloat( "SFX Volume ", &m_MasterSfxVolume, 0.0f, 1.0f);
+	ImGui::SliderFloat( "SFX Volume ", &m_MasterSfxVolume, 0.0f, 1.0f );
 	if( ImGui::Button( "SET" ) )
 	{
 		AudioManager::Get().SetMusicVolume( m_MasterVolume );
 		AudioManager::Get().SetSoundVolume( -1, m_MasterSfxVolume );
 	}
-	ImGui::InputDouble( "Delta Time", &m_DeltaTime);
+	ImGui::InputDouble( "Delta Time", &m_DeltaTime );
 	ImGui::End();
 
-	m_MainLevel.RenderImGui();
+	m_CurrentLevel->RenderImGui();
 }
 
 void Game::RenderEverything()
@@ -125,12 +154,8 @@ void Game::RenderEverything()
 
 	SDL_RenderClear( m_Renderer );
 
-	// Rendering Background
-	SDL_Rect bgRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
-	SDL_RenderCopy( m_Renderer, m_TextureManager.GetTexture( -1 ).texture, NULL, &bgRect );
-
 	// Rendering the level contents
-	m_MainLevel.Render( m_Renderer, m_TextureManager );
+	m_CurrentLevel->Render( m_Renderer, m_TextureManager );
 
 	// Render the Level UI
 	RenderUI();
@@ -140,4 +165,4 @@ void Game::RenderEverything()
 	SDL_RenderPresent( m_Renderer );
 }
 
-void Game::RenderUI() { m_MainLevel.RenderUI( m_Renderer, m_FontManager ); }
+void Game::RenderUI() { m_CurrentLevel->RenderUI( m_Renderer, m_FontManager ); }

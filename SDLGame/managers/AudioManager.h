@@ -22,7 +22,7 @@ class AudioManager
 	void LoadMusic(const std::string& path);
 
 	void PlaySound(int index, int times);
-	void PlayMusic(int index, int times);
+	void PlayMusic(int index);
 
 	void SetSoundVolume(int, float);
 	void SetMusicVolume(float);

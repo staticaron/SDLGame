@@ -19,7 +19,7 @@ class Level
 	void InitColliders(const TextureManager&);
 
 	void HandleCollisions();
-	bool Update(double, const InputManager&);
+	void Update(double, const InputManager&);
 	void RenderImGui();
 	void Render(SDL_Renderer*, const TextureManager&);
 
@@ -34,6 +34,7 @@ class Level
 
 	float m_Timer = 5.0f;
 	float m_CurrentTimer = m_Timer;
+	float m_CountDown = -1;
 
 	bool m_IsGameOver = false;
 

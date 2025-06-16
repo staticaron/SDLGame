@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SDL/SDL.h"
+#include "glm/glm.hpp"
 
 class InputManager 
 {
@@ -9,6 +10,10 @@ class InputManager
 	int m_HorizontalAxis = 0;
 	int m_VerticalAxis = 0;
 
+	bool m_Primary = false;
+
 	void InitProcessSession();
 	void ProcessEvent(SDL_Event);
+
+	glm::vec2 GetPrimaryLocation() const;
 };

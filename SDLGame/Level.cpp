@@ -3,65 +3,74 @@
 
 #include "imgui/imgui.h"
 
+#include "managers/config.h"
+#include "managers/AudioManager.h"
 #include "Level.h"
 #include "Bat.h"
 #include "Ball.h"
-#include "managers/config.h"
 
 
 Level::Level()
-: m_EntityManager(
-{2, 1000, glm::vec2(250, 558), glm::vec2(2, 2)}, 
-{0, 1000, glm::vec2(300, 100), glm::vec2(2, 2)}
-) {}
+	: m_EntityManager(
+		{ 2, 1000, glm::vec2( 250, 558 ), glm::vec2( 2, 2 ) },
+		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 2, 2 ) }
+	)
+{}
 
 Level::~Level() {}
 
-void Level::InitColliders(const TextureManager& textureManager)
+void Level::InitColliders( const TextureManager& textureManager )
 {
-	m_EntityManager.GetBall().InitColliders(textureManager);
-	m_EntityManager.GetBat().InitColliders(textureManager);
+	m_EntityManager.GetBall().InitColliders( textureManager );
+	m_EntityManager.GetBat().InitColliders( textureManager );
 
 	// Make static while the timer is running.
 	m_EntityManager.GetBall().MakeStatic();
 }
 
-void Level::HandleCollisions() 
+void Level::HandleCollisions()
 {
 	auto entities = m_EntityManager.GetEntities();
 
-	for(int x = 0; x < entities.size(); x++)
+	for( int x = 0; x < entities.size(); x++ )
 	{
-		for (int y = 0; y < entities.size(); y++) 
+		for( int y = 0; y < entities.size(); y++ )
 		{
-			if(x == y) continue;
+			if( x == y ) continue;
 
-			auto updateScoreFunc = std::bind(&ScoreManager::AddScore, &m_ScoreManager, std::placeholders::_1 );
+			auto updateScoreFunc = std::bind( &ScoreManager::AddScore, &m_ScoreManager, std::placeholders::_1 );
 
-			entities[x].get().HandleCollisions(entities[y], updateScoreFunc);
-
-			if(entities[x].get().GetType() == BALL && entities[x].get().IsGrounded() )
-			{ 
-				m_IsGameOver = true;
-				break;
-			}
+			entities[x].get().HandleCollisions( entities[y], updateScoreFunc );
 		}
 	}
 }
 
-bool Level::Update(double deltaTime, const InputManager& inputManager)
+void Level::Update( double deltaTime, const InputManager& inputManager )
 {
-	if( m_CurrentTimer >= 0 ) m_CurrentTimer -= deltaTime;
+	if( m_CurrentTimer >= 0 ) 
+	{
+		m_CurrentTimer -= deltaTime;
+
+		if( m_CountDown != int( m_CurrentTimer ) )
+		{
+			if( int( m_CurrentTimer ) != 0 )
+				AudioManager::Get().PlaySound( 2, 0 );
+			else
+				AudioManager::Get().PlaySound(3, 0);
+		}
+	}
 	else if( m_CurrentTimer < 0 )
 	{
 		m_EntityManager.GetBall().MakeDynamic();
 	}
 
-	m_EntityManager.GetBat().Update(deltaTime, inputManager);
-	m_EntityManager.GetBall().Update(deltaTime, inputManager);
+	m_EntityManager.GetBat().Update( deltaTime, inputManager );
+	m_EntityManager.GetBall().Update( deltaTime, inputManager );
 
-	if( m_EntityManager.GetBall().IsGrounded() ) return false;
-	return true;
+	if( m_EntityManager.GetBall().IsGrounded() ) {
+		AudioManager::Get().PlaySound(1, 0);
+		m_IsGameOver = true;
+	}
 }
 
 void Level::RenderImGui()
@@ -76,13 +85,17 @@ void Level::RenderImGui()
 	m_EntityManager.GetBat().RenderImGui();
 }
 
-void Level::Render(SDL_Renderer* renderer, const TextureManager& textureManager)
+void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
 {
-	m_EntityManager.GetBat().Render(renderer, textureManager);
-	m_EntityManager.GetBall().Render(renderer, textureManager);
+	// Rendering Background
+	SDL_Rect bgRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
+	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 0 ).GetTexture(), NULL, &bgRect);
+
+	m_EntityManager.GetBat().Render( renderer, textureManager );
+	m_EntityManager.GetBall().Render( renderer, textureManager );
 }
 
-void Level::RenderUI(SDL_Renderer* renderer, const FontManager& fontManager)
+void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
 {
 	RenderScore( fontManager, renderer );
 	RenderTimer( fontManager, renderer );
@@ -104,63 +117,27 @@ void Level::RestartLevel()
 void Level::RenderScore( const FontManager& fontManager, SDL_Renderer* renderer )
 {
 	std::string scoreValue = std::to_string( m_ScoreManager.GetScore() );
-	SDL_Surface* fontSurface = TTF_RenderText_Solid( fontManager.GetFont( 0 ), scoreValue.c_str(), SDL_Color{ 200, 200, 200 } );
+	TextureContainer container = fontManager.GetTextureFromFont( renderer, 0, scoreValue.c_str(), SDL_Color{ 200, 200, 200 } );
 
-	if( fontSurface == NULL )
-	{
-		std::cout << "ERROR Creating FontSurface" << " " << SDL_GetError() << std::endl;
-		return;
-	}
+	SDL_Rect fontRect = { Config::GetWindowSize().x - Config::GetWindowPadding() - container.GetDimensions().x, 0, container.GetDimensions().x, container.GetDimensions().y };
 
-	SDL_Texture* fontTexture = SDL_CreateTextureFromSurface( renderer, fontSurface );
+	SDL_RenderCopy( renderer, container.GetTexture(), NULL, &fontRect);
 
-	int fontWidth = fontSurface->w;
-	int fontHeight = fontSurface->h;
-
-	SDL_FreeSurface( fontSurface );
-
-	if( fontTexture == NULL )
-	{
-		std::cout << "ERROR Creating FontTexture" << " " << SDL_GetError() << std::endl;
-		return;
-	}
-
-	SDL_Rect fontRect = { Config::GetWindowSize().x - Config::GetWindowPadding() - fontWidth, 0, fontWidth, fontHeight };
-
-	SDL_RenderCopy( renderer, fontTexture, NULL, &fontRect );
-
-	SDL_DestroyTexture( fontTexture );
+	container.Destroy();
 }
 
 void Level::RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer )
 {
-	if ( m_CurrentTimer < 0 ) return;
+	if( m_CurrentTimer < 0 ) return;
 
-	std::string timerStr = std::to_string(int(m_CurrentTimer));
-	SDL_Surface* timerSurface = TTF_RenderText_Solid( fontManager.GetFont(0),  timerStr.c_str(), SDL_Color{ 200, 200, 200 } );
+	m_CountDown = int( m_CurrentTimer );
 
-	if( timerSurface == NULL )
-	{
-		std::cout << "ERROR Creating FontSurface" << " " << SDL_GetError() << std::endl;
-		return;
-	}
+	std::string timerStr = std::to_string( int( m_CurrentTimer ) );
+	TextureContainer container = fontManager.GetTextureFromFont( renderer, 0, timerStr.c_str(), SDL_Color{ 200, 200, 200 } );
 
-	SDL_Texture* timerTexture = SDL_CreateTextureFromSurface( renderer, timerSurface );
+	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - container.GetDimensions().x * 0.5f, Config::GetWindowSize().y * 0.5f - container.GetDimensions().y * 0.5f, container.GetDimensions().x, container.GetDimensions().y };
 
-	int fontWidth = timerSurface->w * 2;
-	int fontHeight = timerSurface->h * 2;
+	SDL_RenderCopy( renderer, container.GetTexture(), NULL, &timerRect);
 
-	SDL_FreeSurface( timerSurface );
-
-	if( timerTexture == NULL )
-	{
-		std::cout << "ERROR Creating FontTexture" << " " << SDL_GetError() << std::endl;
-		return;
-	}
-
-	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - fontWidth * 0.5f, Config::GetWindowSize().y * 0.5f - fontHeight * 0.5f, fontWidth, fontHeight };
-
-	SDL_RenderCopy( renderer, timerTexture, NULL, &timerRect);
-
-	SDL_DestroyTexture( timerTexture );
+	container.Destroy();
 }

@@ -167,6 +167,7 @@
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="include\inih\ini.c" />
     <ClCompile Include="include\inih\INIReader.cpp" />
+    <ClCompile Include="levels\MainMenu.cpp" />
     <ClCompile Include="managers\AudioManager.cpp" />
     <ClCompile Include="managers\config.cpp" />
     <ClCompile Include="managers\EntityManager.cpp" />
@@ -488,6 +489,7 @@
     <ClInclude Include="include\SDL\SDL_guid.h" />
     <ClInclude Include="include\SDL\SDL_hidapi.h" />
     <ClInclude Include="include\SDL\SDL_mixer.h" />
+    <ClInclude Include="levels\MainMenu.h" />
     <ClInclude Include="managers\AudioManager.h" />
     <ClInclude Include="managers\config.h" />
     <ClInclude Include="managers\EntityManager.h" />
@@ -785,6 +787,9 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\musics\bg.mp3" />
+    <Media Include="assets\sounds\count.wav" />
+    <Media Include="assets\sounds\countFinal.wav" />
+    <Media Include="assets\sounds\death.wav" />
     <Media Include="assets\sounds\hit.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

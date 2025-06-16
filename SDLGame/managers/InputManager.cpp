@@ -32,19 +32,39 @@ int getVerticalAxis()
 void InputManager::InitProcessSession()
 {
 	m_Space = false;
+	m_Primary = false;
 }
 
 void InputManager::ProcessEvent(SDL_Event event)
 {
-	if (event.type == SDL_KEYDOWN && !event.key.repeat)
+	if (event.type == SDL_KEYDOWN )
 	{
 		if(event.key.keysym.sym == SDLK_SPACE) m_Space = true;
 	}
-	else if (event.type == SDL_KEYUP && !event.key.repeat)
+	else if (event.type == SDL_KEYUP )
 	{
 		if (event.key.keysym.sym == SDLK_SPACE) m_Space = false;
 	}
 
+	if( event.type == SDL_MOUSEBUTTONDOWN)
+	{
+		if( event.button.button == SDL_BUTTON_LEFT ) m_Primary = true;
+	}
+	else if( event.type == SDL_MOUSEBUTTONUP )
+	{
+		if( event.button.button == SDL_BUTTON_LEFT ) m_Primary = false;
+	}
+
 	m_HorizontalAxis = getHorizotnalAxis();
 	m_VerticalAxis = getVerticalAxis();
+}
+
+glm::vec2 InputManager::GetPrimaryLocation() const
+{
+	int mouseX = -1;
+	int mouseY = -1;
+
+	SDL_GetMouseState(&mouseX, &mouseY);
+
+	return glm::vec2(mouseX, mouseY);
 }

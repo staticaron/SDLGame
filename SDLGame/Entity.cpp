@@ -28,7 +28,7 @@ void Entity::HandleCollisions( const Entity& entity, std::function<void(int)> up
 
 	if( m_CollisionAndOverlap.IsColliding() && GetType() == BALL )
 	{
-		AudioManager::Get().PlaySound(0, 1);
+		AudioManager::Get().PlaySound(0, 0);
 
 		if( entity.GetType() == BAT ) updateScoreFunc( 1 );
 		ResolveCollision( entity );
@@ -64,7 +64,7 @@ void Entity::RenderImGui()
 void Entity::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) const
 {
 	SDL_Rect rect = { m_EntityDetails.pos.x, m_EntityDetails.pos.y, m_EntityBounds.bounds.x, m_EntityBounds.bounds.y };
-	SDL_RenderCopy( renderer, textureManager.GetTexture( m_EntityDetails.textureIndex ).texture, NULL, &rect );
+	SDL_RenderCopy( renderer, textureManager.GetTexture( m_EntityDetails.textureIndex ).GetTexture(), NULL, &rect);
 }
 
 AxisOverlap Entity::DetectCollision( const Entity& entity ) const

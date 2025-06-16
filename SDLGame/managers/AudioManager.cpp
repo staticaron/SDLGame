@@ -14,6 +14,9 @@ void AudioManager::Init()
 	}
 
 	LoadSound("assets/sounds/hit.wav");
+	LoadSound("assets/sounds/death.wav");
+	LoadSound("assets/sounds/count.wav");
+	LoadSound("assets/sounds/countFinal.wav");
 	LoadMusic("assets/musics/bg.ogg");
 }
 
@@ -61,7 +64,7 @@ void AudioManager::PlaySound( int index, int times )
 	Mix_PlayChannel(-1, soundItem, times);
 }
 
-void AudioManager::PlayMusic( int index, int times )
+void AudioManager::PlayMusic( int index )
 {
 	SDL_assert( index > 0 && index < m_MusicList.size() );
 

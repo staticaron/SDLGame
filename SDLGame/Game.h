@@ -6,10 +6,17 @@
 #include "imgui/imgui_impl_sdlrenderer2.h"
 
 #include "Level.h"
+#include "levels/MainMenu.h"
 #include "managers/TextureManager.h"
 #include "managers/InputManager.h"
 #include "managers/ScoreManager.h"
 #include "managers/FontManager.h"
+
+enum GameState
+{
+	MAINMENU,
+	LEVEL
+};
 
 class Game {
 	public:
@@ -27,18 +34,21 @@ class Game {
 	InputManager m_InputManager;
 	ScoreManager m_ScoreManager;
 
-	Level m_MainLevel;
+	std::unique_ptr<MainMenu> m_MainMenuLevel = NULL;
+	std::unique_ptr<Level> m_CurrentLevel = NULL;
 
 	Uint64 NOW = 0;
 	Uint64 LAST = SDL_GetPerformanceCounter();;
 	double m_DeltaTime = 0;
 
-	bool m_ShowImGui = true;
+	bool m_ShowImGui = false;
 
 	float m_MasterVolume = 0.5f;
 	float m_MasterSfxVolume = 0.5f;
 
-	bool Update(double);
+	GameState m_CurrentGameState = MAINMENU;
+
+	void Update(double);
 	void HandleCollisions();
 	void RenderImGui();
 	void RenderEverything();

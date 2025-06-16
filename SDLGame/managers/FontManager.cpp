@@ -27,3 +27,29 @@ TTF_Font* FontManager::GetFont( int x ) const
 	return fonts.at(x);
 }
 
+TextureContainer FontManager::GetTextureFromFont( SDL_Renderer* renderer, int fontIndex, std::string text, SDL_Color fontColor ) const
+{
+	SDL_Surface* fontSurface = TTF_RenderText_Solid( GetFont( 0 ), text.c_str(), fontColor );
+
+	if( fontSurface == NULL )
+	{
+		std::cout << "ERROR Creating FontSurface" << " " << SDL_GetError() << std::endl;
+		return { NULL, -1, -1 };
+	}
+
+	SDL_Texture* fontTexture = SDL_CreateTextureFromSurface( renderer, fontSurface );
+
+	int fontWidth = fontSurface->w;
+	int fontHeight = fontSurface->h;
+
+	SDL_FreeSurface( fontSurface );
+
+	if( fontTexture == NULL )
+	{
+		std::cout << "ERROR Creating FontTexture" << " " << SDL_GetError() << std::endl;
+		return { NULL, -1, -1 };
+	}
+
+	return { fontTexture, fontWidth, fontHeight };
+}
+

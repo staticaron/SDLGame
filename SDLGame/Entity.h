@@ -27,8 +27,8 @@ struct EntityBounds
 	{
 		const TextureContainer& texContainer = textureManager.GetTexture( details.textureIndex );
 
-		bounds.x = texContainer.width * details.scale.x;
-		bounds.y = texContainer.height * details.scale.y;
+		bounds.x = texContainer.GetDimensions().x * details.scale.x;
+		bounds.y = texContainer.GetDimensions().y * details.scale.y;
 	}
 
 	glm::vec2 GetHalfBounds() const { return { bounds.x * 0.5f, bounds.y * 0.5f }; }

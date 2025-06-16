@@ -6,6 +6,8 @@
 
 #include "SDL/SDL_ttf.h";
 
+#include "TextureManager.h"
+
 class FontManager
 {
 public:
@@ -13,6 +15,8 @@ public:
 	~FontManager();
 
 	TTF_Font* GetFont( int x ) const;
+
+	TextureContainer GetTextureFromFont( SDL_Renderer* renderer, int fontIndex, std::string text, SDL_Color fontColor ) const;
 
 private:
 	std::vector<std::string> fontPaths;

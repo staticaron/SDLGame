@@ -96,6 +96,9 @@
     <ClCompile Include="managers\AudioManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="levels\MainMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL\begin_code.h">
@@ -1316,6 +1319,9 @@
     <ClInclude Include="include\SDL\SDL_mixer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="levels\MainMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\x86\SDL2.lib">
@@ -1863,6 +1869,15 @@
   <ItemGroup>
     <Media Include="assets\musics\bg.mp3" />
     <Media Include="assets\sounds\hit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\sounds\death.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\sounds\count.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\sounds\countFinal.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>
