@@ -29,8 +29,6 @@ void MainMenu::Update( double, const InputManager& inputManager )
 	{
 		glm::vec2 cursorPosition = inputManager.GetPrimaryLocation();
 
-		std::cout << "Clicked at : " << cursorPosition.x << ", " << cursorPosition.y << std::endl;
-
 		for( int x = 0; x < m_ButtonDimensions.size(); x++ )
 		{
 			if( !pointInRect( m_ButtonDimensions.at( x ), cursorPosition ) ) continue;
@@ -91,7 +89,7 @@ void MainMenu::RenderImGui( SDL_Renderer* )
 
 void MainMenu::StartGame()
 {
-	std::cout << "Load the game" << std::endl;
+	m_StartGame = true;
 }
 
 void MainMenu::QuitGame()

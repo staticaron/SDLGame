@@ -19,6 +19,11 @@ Level::Level()
 
 Level::~Level() {}
 
+void Level::Unload()
+{
+	std::cout << "Unload Level not Implemented" << std::endl;
+}
+
 void Level::InitColliders( const TextureManager& textureManager )
 {
 	m_EntityManager.GetBall().InitColliders( textureManager );
@@ -135,7 +140,9 @@ void Level::RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer 
 	std::string timerStr = std::to_string( int( m_CurrentTimer ) );
 	TextureContainer container = fontManager.GetTextureFromFont( renderer, 0, timerStr.c_str(), SDL_Color{ 200, 200, 200 } );
 
-	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - container.GetDimensions().x * 0.5f, Config::GetWindowSize().y * 0.5f - container.GetDimensions().y * 0.5f, container.GetDimensions().x, container.GetDimensions().y };
+	float xScale = 2;
+	float yScale = 2;
+	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - container.GetDimensions().x * xScale * 0.5f, Config::GetWindowSize().y * 0.5f - container.GetDimensions().y * yScale * 0.5f, container.GetDimensions().x * xScale, container.GetDimensions().y * yScale };
 
 	SDL_RenderCopy( renderer, container.GetTexture(), NULL, &timerRect);
 

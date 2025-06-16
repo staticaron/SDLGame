@@ -23,8 +23,10 @@ class MainMenu
 	void QuitGame();
 
 	bool GetQuitStatus() const { return m_Quit; };
+	bool GetStartGameStatus() const { return m_StartGame; };
 
 	private:
 	std::map<int, SDL_Rect> m_ButtonDimensions;
 	bool m_Quit = false;
+	bool m_StartGame = false;
 };

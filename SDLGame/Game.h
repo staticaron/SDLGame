@@ -18,14 +18,15 @@ enum GameState
 	LEVEL
 };
 
-class Game {
-	public:
+class Game
+{
+public:
 	Game();
 	~Game();
 
 	void Run();
 
-	private:
+private:
 	SDL_Window* m_Window;
 	SDL_Renderer* m_Renderer;
 
@@ -48,9 +49,12 @@ class Game {
 
 	GameState m_CurrentGameState = MAINMENU;
 
-	void Update(double);
+	bool Update( double );
 	void HandleCollisions();
 	void RenderImGui();
 	void RenderEverything();
 	void RenderUI();
+	void RenderGeometry();
+
+	void ChangeGameState( GameState );
 };

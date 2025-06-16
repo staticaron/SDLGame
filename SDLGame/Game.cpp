@@ -83,51 +83,55 @@ void Game::Run()
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		if( m_CurrentGameState == LEVEL )
-		{
-			Update( m_DeltaTime );
-			if( m_CurrentLevel->IsGameOver() )
-			{
-				m_CurrentLevel->RestartLevel();
-				m_CurrentLevel->Update( m_DeltaTime, m_InputManager );
-			}
-			HandleCollisions();
-			RenderImGui();
-			RenderEverything();
-		}
-		else
-		{
-			m_MainMenuLevel->Update( m_DeltaTime, m_InputManager );
-
-			if( m_MainMenuLevel->GetQuitStatus() ) break;
-
-			m_MainMenuLevel->RenderImGui( m_Renderer );
-
-			ImGui::Render();
-
-			SDL_RenderClear( m_Renderer );
-
-			// Rendering the level contents
-			m_MainMenuLevel->Render( m_Renderer, m_TextureManager );
-
-			// Render the Level UI
-			m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager );
-
-			ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
-
-			SDL_RenderPresent( m_Renderer );
-		}
+		if( !Update( m_DeltaTime ) ) break;
+		HandleCollisions();
+		RenderImGui();
+		RenderEverything();
 	}
 }
 
-void Game::Update( double deltaTime )
+bool Game::Update( double deltaTime )
 {
-	m_CurrentLevel->Update( deltaTime, m_InputManager );
+	switch( m_CurrentGameState )
+	{
+	case MAINMENU:
+		m_MainMenuLevel->Update( deltaTime, m_InputManager );
+
+		if( m_MainMenuLevel->GetQuitStatus() ) return false;
+		else if( m_MainMenuLevel->GetStartGameStatus() )
+		{
+			m_CurrentLevel = std::make_unique<Level>();
+			m_CurrentLevel->InitColliders( m_TextureManager );
+			m_CurrentGameState = LEVEL;
+		}
+		break;
+	case LEVEL:
+		m_CurrentLevel->Update( deltaTime, m_InputManager );
+		if( m_CurrentLevel->IsGameOver() )
+		{
+			m_CurrentLevel->RestartLevel();
+			m_CurrentLevel->Update( m_DeltaTime, m_InputManager );
+		}
+		break;
+	default:
+		break;
+	}
+
+	return true;
 }
 
 void Game::HandleCollisions()
 {
-	m_CurrentLevel->HandleCollisions();
+	switch( m_CurrentGameState )
+	{
+	case MAINMENU:
+		break;
+	case LEVEL:
+		m_CurrentLevel->HandleCollisions();
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::RenderImGui()
@@ -145,7 +149,18 @@ void Game::RenderImGui()
 	ImGui::InputDouble( "Delta Time", &m_DeltaTime );
 	ImGui::End();
 
-	m_CurrentLevel->RenderImGui();
+	switch( m_CurrentGameState )
+	{
+	case MAINMENU:
+		m_MainMenuLevel->RenderImGui( m_Renderer );
+		break;
+	case LEVEL:
+		m_CurrentLevel->RenderImGui();
+		break;
+	default:
+		break;
+	}
+
 }
 
 void Game::RenderEverything()
@@ -154,10 +169,8 @@ void Game::RenderEverything()
 
 	SDL_RenderClear( m_Renderer );
 
-	// Rendering the level contents
-	m_CurrentLevel->Render( m_Renderer, m_TextureManager );
+	RenderGeometry();
 
-	// Render the Level UI
 	RenderUI();
 
 	ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
@@ -165,4 +178,52 @@ void Game::RenderEverything()
 	SDL_RenderPresent( m_Renderer );
 }
 
-void Game::RenderUI() { m_CurrentLevel->RenderUI( m_Renderer, m_FontManager ); }
+void Game::RenderUI()
+{
+	switch( m_CurrentGameState )
+	{
+	case MAINMENU:
+		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager );
+		break;
+	case LEVEL:
+		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager );
+		break;
+	default:
+		break;
+	}
+}
+
+void Game::RenderGeometry()
+{
+	switch( m_CurrentGameState )
+	{
+	case MAINMENU:
+		m_MainMenuLevel->Render( m_Renderer, m_TextureManager );
+		break;
+	case LEVEL:
+		m_CurrentLevel->Render( m_Renderer, m_TextureManager );
+		break;
+	default:
+		break;
+	}
+}
+
+void Game::ChangeGameState( GameState gameStateToChangeTo )
+{
+	if( m_CurrentGameState == gameStateToChangeTo ) return;
+
+	if( gameStateToChangeTo == LEVEL )
+	{
+		m_CurrentLevel = std::make_unique<Level>();
+		m_CurrentLevel->InitColliders( m_TextureManager );
+		m_CurrentGameState = LEVEL;
+	}
+	else if ( gameStateToChangeTo == MAINMENU )
+	{
+		if( m_CurrentLevel != NULL )
+		{
+			 m_CurrentLevel->Unload();
+		}
+		m_CurrentGameState = MAINMENU;
+	}
+}

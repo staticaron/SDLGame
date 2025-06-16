@@ -16,6 +16,8 @@ class Level
 	Level();
 	~Level();
 
+	void Unload();
+
 	void InitColliders(const TextureManager&);
 
 	void HandleCollisions();
