@@ -8,9 +8,9 @@
 
 MainMenu::MainMenu()
 {
-	m_Buttons[0] = { "START", {-1, -1}, NONE, std::bind( &MainMenu::StartGame, this ) };
-	m_Buttons[1] = { "ABOUT", {-1, -1}, NONE, std::bind( &MainMenu::StartGame, this ) };
-	m_Buttons[2] = { "QUIT", {-1, -1}, NONE, std::bind( &MainMenu::QuitGame, this ) };
+	m_Buttons[0] = { "START", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::StartGame, this ) };
+	m_Buttons[1] = { "ABOUT", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::StartGame, this ) };
+	m_Buttons[2] = { "QUIT", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::QuitGame, this ) };
 }
 
 MainMenu::~MainMenu()
@@ -26,22 +26,21 @@ bool pointInRect( const SDL_Rect& rect, const glm::vec2& point )
 	return xOverlap && yOverlap;
 }
 
-void MainMenu::Update( double, const InputManager& inputManager )
+void MainMenu::Update( double deltaTime, const InputManager& inputManager )
 {
+	// TODO: Handle Transition Triggers
+ 
 	for( int x = 0; x < m_Buttons.size(); x++ )
 	{
 		glm::vec2 cursorPosition = inputManager.GetCursorPosition();
 
 		if( pointInRect( m_Buttons.at( x ).dimensions, cursorPosition ) )
 		{
-			m_Buttons[x].currentState = HOVERED;
+			m_Buttons[x].currentState = ButtonState::HOVERED;
 
-			if( inputManager.m_Primary ) m_Buttons.at(x).pressCallback();
+			if( inputManager.m_Primary ) m_Buttons.at( x ).pressCallback();
 		}
-		else
-		{
-			m_Buttons[x].currentState = NONE;
-		}
+		else m_Buttons[x].currentState = ButtonState::NONE;
 	}
 }
 
@@ -55,7 +54,7 @@ void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager 
 {
 	for( int x = 0; x < m_Buttons.size(); x++ )
 	{
-		TextureContainer btnContainer = fontManager.GetTextureFromFont( renderer, 0, m_Buttons.at( x ).text.c_str(), m_Buttons.at( x ).currentState == HOVERED ? m_HoverColor : m_NormalColor );
+		TextureContainer btnContainer = fontManager.GetTextureFromFont( renderer, 0, m_Buttons.at( x ).text.c_str(), m_Buttons.at( x ).currentState == ButtonState::HOVERED ? m_HoverColor : m_NormalColor );
 
 		float startY = Config::GetWindowSize().y * 0.5f - m_Buttons.size() * btnContainer.GetDimensions().y * 0.5f;
 		SDL_Rect fontRect = { Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - btnContainer.GetDimensions().x * 0.5f, startY + x * btnContainer.GetDimensions().y, btnContainer.GetDimensions().x, btnContainer.GetDimensions().y };
@@ -67,6 +66,23 @@ void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager 
 	}
 }
 
+void MainMenu::RenderTransitions( SDL_Renderer* renderer, const TextureManager& textureManager )
+{
+	SDL_Rect transitionRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
+
+	SDL_Texture* transitionTexture = textureManager.GetBackgroundTexture( 2 ).GetTexture();
+
+	SDL_SetTextureBlendMode( transitionTexture, SDL_BLENDMODE_BLEND );
+
+	Uint8 alphaValue = (m_CurrentTransitionTime / m_TransitionTime) * 255;
+
+	if( m_TransitionState == TransitionState::START ) alphaValue = 1 - alphaValue;
+
+	SDL_SetTextureAlphaMod( transitionTexture, alphaValue );
+
+	SDL_RenderCopy( renderer, transitionTexture, NULL, &transitionRect );
+}
+
 void MainMenu::RenderImGui( SDL_Renderer* )
 {
 	for( auto& [index, buttonDetails] : m_Buttons )
@@ -75,6 +91,13 @@ void MainMenu::RenderImGui( SDL_Renderer* )
 		ImVec2 max = { (float)(buttonDetails.dimensions.x + buttonDetails.dimensions.w), (float)(buttonDetails.dimensions.y + buttonDetails.dimensions.h) };
 		ImGui::GetBackgroundDrawList()->AddRect( min, max, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
 	}
+}
+
+void MainMenu::ChangeTransitionState( TransitionState stateToSet )
+{
+	m_TransitionState = stateToSet;
+	m_CurrentTransitionTime = 0.0f;
+	m_IsTransitioning = true;
 }
 
 void MainMenu::StartGame()

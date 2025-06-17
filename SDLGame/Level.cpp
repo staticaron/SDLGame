@@ -14,10 +14,15 @@ Level::Level()
 	: m_EntityManager(
 		{ 2, 1000, glm::vec2( 250, 558 ), glm::vec2( 2, 2 ) },
 		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 2, 2 ) }
-	)
-{}
+	), m_Camera( { 0, 0 }, { 1, 1 })
+{
+	ChangeTransitionState( TransitionState::START );
+}
 
-Level::~Level() {}
+Level::~Level() 
+{
+	std::cout << "Level destroyed" << std::endl;
+}
 
 void Level::Unload()
 {
@@ -52,29 +57,46 @@ void Level::HandleCollisions()
 
 void Level::Update( double deltaTime, const InputManager& inputManager )
 {
-	if( m_CurrentTimer >= 0 ) 
+	if( m_IsTransitioning )
 	{
-		m_CurrentTimer -= deltaTime;
+		m_CurrentTransitionTime += deltaTime;
 
-		if( m_CountDown != int( m_CurrentTimer ) )
+		if( m_CurrentTransitionTime > m_TransitionTime )
 		{
-			if( int( m_CurrentTimer ) != 0 )
-				AudioManager::Get().PlaySound( 2, 0 );
-			else
-				AudioManager::Get().PlaySound(3, 0);
+			m_IsTransitioning = false;
+			if ( m_TransitionState == TransitionState::END ) m_IsExit = true;
 		}
 	}
-	else if( m_CurrentTimer < 0 )
-	{
-		m_EntityManager.GetBall().MakeDynamic();
+	else{
+		if( m_CurrentTimer >= 0 ) 
+		{
+			m_CurrentTimer -= deltaTime;
+
+			if( m_CountDown != int( m_CurrentTimer ) )
+			{
+				if( int( m_CurrentTimer ) != 0 )
+					AudioManager::Get().PlaySound( 2, 0 );
+				else
+					AudioManager::Get().PlaySound(3, 0);
+			}
+		}
+		else if( m_CurrentTimer < 0 )
+		{
+			m_EntityManager.GetBall().MakeDynamic();
+		}
+
+		m_EntityManager.GetBat().Update( deltaTime, inputManager );
+		m_EntityManager.GetBall().Update( deltaTime, inputManager );
+
+		if( m_EntityManager.GetBall().IsGrounded() ) {
+			AudioManager::Get().PlaySound(1, 0);
+			m_IsGameOver = true;
+		}
 	}
 
-	m_EntityManager.GetBat().Update( deltaTime, inputManager );
-	m_EntityManager.GetBall().Update( deltaTime, inputManager );
-
-	if( m_EntityManager.GetBall().IsGrounded() ) {
-		AudioManager::Get().PlaySound(1, 0);
-		m_IsGameOver = true;
+	if( inputManager.m_Escape )
+	{
+		ChangeTransitionState( TransitionState::END );
 	}
 }
 
@@ -86,13 +108,13 @@ void Level::RenderImGui()
 	ImGui::EndDisabled();
 	ImGui::End();
 
+	m_Camera.RenderImGui();
 	m_EntityManager.GetBall().RenderImGui();
 	m_EntityManager.GetBat().RenderImGui();
 }
 
 void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
 {
-	// Rendering Background
 	SDL_Rect bgRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
 	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 0 ).GetTexture(), NULL, &bgRect);
 
@@ -106,6 +128,23 @@ void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
 	RenderTimer( fontManager, renderer );
 }
 
+void Level::RenderTransitions( SDL_Renderer* renderer, const TextureManager& textureManager )
+{
+	SDL_Rect transitionRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
+
+	SDL_Texture* transitionTexture = textureManager.GetBackgroundTexture( 2 ).GetTexture();
+
+	SDL_SetTextureBlendMode( transitionTexture, SDL_BLENDMODE_BLEND );
+
+	Uint8 alphaValue = (m_CurrentTransitionTime / m_TransitionTime) * 255;
+
+	if( m_TransitionState == TransitionState::START ) alphaValue = 1 - alphaValue;
+
+	SDL_SetTextureAlphaMod( transitionTexture, alphaValue );
+
+	SDL_RenderCopy( renderer, transitionTexture, NULL, &transitionRect );
+}
+
 void Level::RestartLevel()
 {
 	m_IsGameOver = false;
@@ -117,6 +156,13 @@ void Level::RestartLevel()
 	m_EntityManager.GetBat().ResetDetails();
 
 	m_CurrentTimer = m_Timer;
+}
+
+void Level::ChangeTransitionState( TransitionState stateToSet )
+{
+	m_TransitionState = stateToSet;
+	m_CurrentTransitionTime = 0.0f;
+	m_IsTransitioning = true;
 }
 
 void Level::RenderScore( const FontManager& fontManager, SDL_Renderer* renderer )

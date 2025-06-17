@@ -109,7 +109,7 @@ bool Game::Update( double deltaTime )
 			m_CurrentLevel->RestartLevel();
 			m_CurrentLevel->Update( m_DeltaTime, m_InputManager );
 		}
-		if ( m_InputManager.m_Escape ) 
+		if ( m_CurrentLevel->IsExit() ) 
 		{
 			ChangeGameState( MAINMENU );
 			return false;
@@ -175,6 +175,8 @@ void Game::RenderEverything()
 
 	RenderUI();
 
+	RenderTransitions();
+
 	ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
 
 	SDL_RenderPresent( m_Renderer );
@@ -192,6 +194,18 @@ void Game::RenderUI()
 		break;
 	default:
 		break;
+	}
+}
+
+void Game::RenderTransitions()
+{
+	if( m_CurrentGameState == LEVEL )
+	{
+		m_CurrentLevel->RenderTransitions( m_Renderer, m_TextureManager );
+	}
+	else if( m_CurrentGameState == MAINMENU )
+	{
+		m_MainMenuLevel->RenderTransitions( m_Renderer, m_TextureManager );
 	}
 }
 

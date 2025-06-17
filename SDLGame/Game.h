@@ -55,8 +55,10 @@ private:
 	void HandleCollisions();
 	void RenderImGui();
 	void RenderEverything();
-	void RenderUI();
+
 	void RenderGeometry();
+	void RenderUI();
+	void RenderTransitions();
 
 	void ChangeGameState( GameState );
 };

@@ -53,9 +53,9 @@ void Entity::RenderImGui()
 	windowTitle += " Settings";
 
 	ImGui::Begin( windowTitle.c_str() );
-	ImGui::InputFloat2( "Max Point", maxArr );
 	ImGui::Checkbox( "Show Bounds", &m_ShowBounds );
 	ImGui::BeginDisabled();
+	ImGui::InputFloat2( "Max Point", maxArr );
 	ImGui::Checkbox("IsGrounded", &m_IsGrounded);
 	ImGui::EndDisabled();
 	ImGui::End();

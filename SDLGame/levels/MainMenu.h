@@ -8,11 +8,12 @@
 
 #include "SDL/SDL.h"
 
+#include "../Level.h"
 #include "../managers/InputManager.h"
 #include "../managers/FontManager.h"
 #include "../managers/TextureManager.h"
 
-enum ButtonState
+enum class ButtonState
 {
 	HOVERED,
 	NONE
@@ -35,9 +36,14 @@ public:
 	~MainMenu();
 
 	void Update( double, const InputManager& );
+
 	void Render( SDL_Renderer*, const TextureManager& );
 	void RenderUI( SDL_Renderer*, const FontManager& );
+	void RenderTransitions( SDL_Renderer*, const TextureManager& );
+
 	void RenderImGui( SDL_Renderer* );
+
+	void ChangeTransitionState( TransitionState );
 
 	void StartGame();
 	void QuitGame();
@@ -47,6 +53,11 @@ public:
 
 private:
 	std::map<int, MainMenuButton> m_Buttons;
+
+	TransitionState m_TransitionState = TransitionState::START;
+	float m_TransitionTime = 1.0f;
+	float m_CurrentTransitionTime = 0.0f;
+	bool m_IsTransitioning = true;
 
 	bool m_Quit = false;
 	bool m_StartGame = false;
