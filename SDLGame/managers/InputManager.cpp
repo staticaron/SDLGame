@@ -60,7 +60,7 @@ void InputManager::ProcessEvent(SDL_Event event)
 	m_VerticalAxis = getVerticalAxis();
 }
 
-glm::vec2 InputManager::GetPrimaryLocation() const
+glm::vec2 InputManager::GetCursorPosition() const
 {
 	int mouseX = -1;
 	int mouseY = -1;

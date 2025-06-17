@@ -18,5 +18,5 @@ class InputManager
 	void InitProcessSession();
 	void ProcessEvent(SDL_Event);
 
-	glm::vec2 GetPrimaryLocation() const;
+	glm::vec2 GetCursorPosition() const;
 };
