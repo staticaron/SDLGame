@@ -49,6 +49,8 @@ private:
 
 	GameState m_CurrentGameState = MAINMENU;
 
+	bool m_Quit = false;
+
 	bool Update( double );
 	void HandleCollisions();
 	void RenderImGui();

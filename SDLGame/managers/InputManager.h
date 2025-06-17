@@ -7,6 +7,9 @@ class InputManager
 {
 	public:
 	bool m_Space = false;
+	bool m_Tab = false;
+	bool m_Escape = false;
+
 	int m_HorizontalAxis = 0;
 	int m_VerticalAxis = 0;
 

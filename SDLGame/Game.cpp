@@ -47,11 +47,9 @@ Game::~Game()
 
 void Game::Run()
 {
-	bool isRunning = true;
-
 	SDL_Event event;
 
-	while( isRunning )
+	while( !m_Quit )
 	{
 		NOW = SDL_GetPerformanceCounter();
 		m_DeltaTime = (double)(NOW - LAST) / (double)SDL_GetPerformanceFrequency();
@@ -65,26 +63,27 @@ void Game::Run()
 
 			if( event.type == SDL_QUIT )
 			{
-				isRunning = false;
+				m_Quit = true;
 				break;
 			}
 
-			if( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE )
-			{
-				m_ShowImGui = !m_ShowImGui;
-			}
-
 			m_InputManager.ProcessEvent( event );
+
+			if( m_InputManager.m_Tab ) m_ShowImGui = !m_ShowImGui;
 		}
 
-		if( !isRunning ) break;
+		if( m_Quit ) break;
+
+		if( !Update( m_DeltaTime ) ) continue;
+
+		if( m_Quit ) break;
+
+		HandleCollisions();
 
 		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
-		if( !Update( m_DeltaTime ) ) break;
-		HandleCollisions();
 		RenderImGui();
 		RenderEverything();
 	}
@@ -97,12 +96,10 @@ bool Game::Update( double deltaTime )
 	case MAINMENU:
 		m_MainMenuLevel->Update( deltaTime, m_InputManager );
 
-		if( m_MainMenuLevel->GetQuitStatus() ) return false;
+		if( m_MainMenuLevel->GetQuitStatus() ) m_Quit = true;
 		else if( m_MainMenuLevel->GetStartGameStatus() )
 		{
-			m_CurrentLevel = std::make_unique<Level>();
-			m_CurrentLevel->InitColliders( m_TextureManager );
-			m_CurrentGameState = LEVEL;
+			ChangeGameState( LEVEL );
 		}
 		break;
 	case LEVEL:
@@ -111,6 +108,11 @@ bool Game::Update( double deltaTime )
 		{
 			m_CurrentLevel->RestartLevel();
 			m_CurrentLevel->Update( m_DeltaTime, m_InputManager );
+		}
+		if ( m_InputManager.m_Escape ) 
+		{
+			ChangeGameState( MAINMENU );
+			return false;
 		}
 		break;
 	default:
@@ -220,10 +222,8 @@ void Game::ChangeGameState( GameState gameStateToChangeTo )
 	}
 	else if ( gameStateToChangeTo == MAINMENU )
 	{
-		if( m_CurrentLevel != NULL )
-		{
-			 m_CurrentLevel->Unload();
-		}
+		if( m_CurrentLevel != NULL ) m_CurrentLevel->Unload();
+		m_MainMenuLevel = std::make_unique<MainMenu>();
 		m_CurrentGameState = MAINMENU;
 	}
 }

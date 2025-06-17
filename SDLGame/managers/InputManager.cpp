@@ -33,6 +33,7 @@ void InputManager::InitProcessSession()
 {
 	m_Space = false;
 	m_Primary = false;
+	m_Tab = false;
 }
 
 void InputManager::ProcessEvent(SDL_Event event)
@@ -40,19 +41,19 @@ void InputManager::ProcessEvent(SDL_Event event)
 	if (event.type == SDL_KEYDOWN )
 	{
 		if(event.key.keysym.sym == SDLK_SPACE) m_Space = true;
+		if( event.key.keysym.sym == SDLK_TAB ) m_Tab = true;
+		if( event.key.keysym.sym == SDLK_ESCAPE ) m_Escape = true;
 	}
-	else if (event.type == SDL_KEYUP )
+	else if( event.type == SDL_KEYUP )
 	{
-		if (event.key.keysym.sym == SDLK_SPACE) m_Space = false;
+		if( event.key.keysym.sym == SDLK_SPACE ) m_Space = false;
+		if( event.key.keysym.sym == SDLK_TAB ) m_Tab = false;
+		if( event.key.keysym.sym == SDLK_ESCAPE ) m_Escape = false;
 	}
 
 	if( event.type == SDL_MOUSEBUTTONDOWN)
 	{
 		if( event.button.button == SDL_BUTTON_LEFT ) m_Primary = true;
-	}
-	else if( event.type == SDL_MOUSEBUTTONUP )
-	{
-		if( event.button.button == SDL_BUTTON_LEFT ) m_Primary = false;
 	}
 
 	m_HorizontalAxis = getHorizotnalAxis();
