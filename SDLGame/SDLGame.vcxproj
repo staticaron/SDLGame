@@ -107,6 +107,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions); DEBUG</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -179,6 +180,7 @@
     <ClCompile Include="managers\InputManager.cpp" />
     <ClCompile Include="managers\ScoreManager.cpp" />
     <ClCompile Include="managers\TextureManager.cpp" />
+    <ClCompile Include="managers\TransitionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -589,6 +591,7 @@
     <ClInclude Include="managers\InputManager.h" />
     <ClInclude Include="managers\ScoreManager.h" />
     <ClInclude Include="managers\TextureManager.h" />
+    <ClInclude Include="managers\TransitionManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\musics\bg.ogg" />

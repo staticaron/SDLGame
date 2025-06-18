@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include "glm/glm.hpp"
+
 #include "managers/config.h"
 #include "managers/AudioManager.h"
 
@@ -53,6 +55,11 @@ void Game::Run()
 	{
 		NOW = SDL_GetPerformanceCounter();
 		m_DeltaTime = (double)(NOW - LAST) / (double)SDL_GetPerformanceFrequency();
+		
+		#if DEBUG
+		m_DeltaTime = glm::clamp( m_DeltaTime, 0.0, 0.005 );
+		#endif
+
 		LAST = NOW;
 
 		m_InputManager.InitProcessSession();
@@ -100,6 +107,7 @@ bool Game::Update( double deltaTime )
 		else if( m_MainMenuLevel->GetStartGameStatus() )
 		{
 			ChangeGameState( LEVEL );
+			return false;
 		}
 		break;
 	case LEVEL:

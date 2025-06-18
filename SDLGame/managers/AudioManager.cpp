@@ -66,7 +66,7 @@ void AudioManager::PlaySound( int index, int times )
 
 void AudioManager::PlayMusic( int index )
 {
-	SDL_assert( index > 0 && index < m_MusicList.size() );
+	SDL_assert( index >= 0 && index < m_MusicList.size() );
 
 	auto musicItem = m_MusicList.at( index );
 	Mix_PlayMusic( musicItem, -1 );

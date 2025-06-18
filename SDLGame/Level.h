@@ -10,11 +10,7 @@
 #include "managers/InputManager.h"
 #include "managers/EntityManager.h"
 #include "managers/ScoreManager.h"
-
-enum class TransitionState
-{
-	START, END, NONE
-};
+#include "managers/TransitionManager.h"
 
 class Level
 {
@@ -31,15 +27,15 @@ public:
 
 	void Render( SDL_Renderer*, const TextureManager& );
 	void RenderUI( SDL_Renderer*, const FontManager& );
-	void RenderTransitions( SDL_Renderer*, const TextureManager& ); 
+	void RenderTransitions( SDL_Renderer*, const TextureManager& );
 	void RenderImGui();
 
+	void StartLevel();
 	void RestartLevel();
+	void ExitLevel();
 
 	bool IsGameOver() const { return m_IsGameOver; }
 	bool IsExit() const { return m_IsExit; }
-
-	void ChangeTransitionState( TransitionState );
 
 	void RenderScore( const FontManager& fontManager, SDL_Renderer* renderer );
 	void RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer );
@@ -47,6 +43,7 @@ public:
 private:
 	EntityManager m_EntityManager;
 	ScoreManager m_ScoreManager;
+	TransitionManager m_TransitionManager;
 	Camera m_Camera;
 
 	float m_Timer = 5.0f;

@@ -12,6 +12,7 @@
 #include "../managers/InputManager.h"
 #include "../managers/FontManager.h"
 #include "../managers/TextureManager.h"
+#include "../managers/TransitionManager.h"
 
 enum class ButtonState
 {
@@ -43,21 +44,21 @@ public:
 
 	void RenderImGui( SDL_Renderer* );
 
-	void ChangeTransitionState( TransitionState );
+	void StartButtonCallback();
+	void AboutButtonCallback();
+	void QuitButtonCallback();
 
 	void StartGame();
 	void QuitGame();
 
+	// Getters and Setters
 	bool GetQuitStatus() const { return m_Quit; };
 	bool GetStartGameStatus() const { return m_StartGame; };
 
 private:
 	std::map<int, MainMenuButton> m_Buttons;
 
-	TransitionState m_TransitionState = TransitionState::START;
-	float m_TransitionTime = 1.0f;
-	float m_CurrentTransitionTime = 0.0f;
-	bool m_IsTransitioning = true;
+	TransitionManager m_TransitionManager;
 
 	bool m_Quit = false;
 	bool m_StartGame = false;

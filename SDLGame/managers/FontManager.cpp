@@ -23,7 +23,7 @@ FontManager::~FontManager(){}
 
 TTF_Font* FontManager::GetFont( int x ) const
 {
-	SDL_assert( x > 0 && x < fonts.size() );
+	SDL_assert( x >= 0 && x < fonts.size() );
 	return fonts.at(x);
 }
 

@@ -8,9 +8,12 @@
 
 MainMenu::MainMenu()
 {
-	m_Buttons[0] = { "START", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::StartGame, this ) };
-	m_Buttons[1] = { "ABOUT", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::StartGame, this ) };
-	m_Buttons[2] = { "QUIT", {-1, -1}, ButtonState::NONE, std::bind( &MainMenu::QuitGame, this ) };
+	m_Buttons[0] = { "START", {-1, -1}, ButtonState::NONE, [this](){ this->StartButtonCallback(); } };
+	m_Buttons[1] = { "ABOUT", {-1, -1}, ButtonState::NONE, [this]() { this->AboutButtonCallback(); } };
+	m_Buttons[2] = { "QUIT", {-1, -1}, ButtonState::NONE, [this]() { this->QuitButtonCallback(); } };
+
+	m_TransitionManager.Init( TransitionState::START );
+	m_TransitionManager.StartTransition( []() {} );
 }
 
 MainMenu::~MainMenu()
@@ -28,8 +31,12 @@ bool pointInRect( const SDL_Rect& rect, const glm::vec2& point )
 
 void MainMenu::Update( double deltaTime, const InputManager& inputManager )
 {
-	// TODO: Handle Transition Triggers
- 
+	if( m_TransitionManager.IsTransitioning() )
+	{
+		m_TransitionManager.Update( deltaTime );
+		return;
+	}
+
 	for( int x = 0; x < m_Buttons.size(); x++ )
 	{
 		glm::vec2 cursorPosition = inputManager.GetCursorPosition();
@@ -42,6 +49,7 @@ void MainMenu::Update( double deltaTime, const InputManager& inputManager )
 		}
 		else m_Buttons[x].currentState = ButtonState::NONE;
 	}
+
 }
 
 void MainMenu::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
@@ -68,19 +76,7 @@ void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager 
 
 void MainMenu::RenderTransitions( SDL_Renderer* renderer, const TextureManager& textureManager )
 {
-	SDL_Rect transitionRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
-
-	SDL_Texture* transitionTexture = textureManager.GetBackgroundTexture( 2 ).GetTexture();
-
-	SDL_SetTextureBlendMode( transitionTexture, SDL_BLENDMODE_BLEND );
-
-	Uint8 alphaValue = (m_CurrentTransitionTime / m_TransitionTime) * 255;
-
-	if( m_TransitionState == TransitionState::START ) alphaValue = 1 - alphaValue;
-
-	SDL_SetTextureAlphaMod( transitionTexture, alphaValue );
-
-	SDL_RenderCopy( renderer, transitionTexture, NULL, &transitionRect );
+	m_TransitionManager.RenderTransitions( renderer, textureManager );
 }
 
 void MainMenu::RenderImGui( SDL_Renderer* )
@@ -93,11 +89,20 @@ void MainMenu::RenderImGui( SDL_Renderer* )
 	}
 }
 
-void MainMenu::ChangeTransitionState( TransitionState stateToSet )
+void MainMenu::StartButtonCallback()
 {
-	m_TransitionState = stateToSet;
-	m_CurrentTransitionTime = 0.0f;
-	m_IsTransitioning = true;
+	m_TransitionManager.Init( TransitionState::END );
+	m_TransitionManager.StartTransition( [this](){ this->StartGame(); });
+}
+
+void MainMenu::AboutButtonCallback()
+{
+}
+
+void MainMenu::QuitButtonCallback()
+{
+	m_TransitionManager.Init( TransitionState::END );
+	m_TransitionManager.StartTransition( [this]() { this->QuitGame(); } );
 }
 
 void MainMenu::StartGame()

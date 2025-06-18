@@ -1,4 +1,5 @@
 #include <iostream>
+#include <functional>
 #include <charconv>
 
 #include "imgui/imgui.h"
@@ -16,7 +17,8 @@ Level::Level()
 		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 2, 2 ) }
 	), m_Camera( { 0, 0 }, { 1, 1 })
 {
-	ChangeTransitionState( TransitionState::START );
+	m_TransitionManager.Init( TransitionState::START );
+	m_TransitionManager.StartTransition( [this](){ } );
 }
 
 Level::~Level() 
@@ -34,7 +36,6 @@ void Level::InitColliders( const TextureManager& textureManager )
 	m_EntityManager.GetBall().InitColliders( textureManager );
 	m_EntityManager.GetBat().InitColliders( textureManager );
 
-	// Make static while the timer is running.
 	m_EntityManager.GetBall().MakeStatic();
 }
 
@@ -57,15 +58,9 @@ void Level::HandleCollisions()
 
 void Level::Update( double deltaTime, const InputManager& inputManager )
 {
-	if( m_IsTransitioning )
+	if( m_TransitionManager.IsTransitioning() )
 	{
-		m_CurrentTransitionTime += deltaTime;
-
-		if( m_CurrentTransitionTime > m_TransitionTime )
-		{
-			m_IsTransitioning = false;
-			if ( m_TransitionState == TransitionState::END ) m_IsExit = true;
-		}
+		m_TransitionManager.Update( deltaTime );
 	}
 	else{
 		if( m_CurrentTimer >= 0 ) 
@@ -96,7 +91,8 @@ void Level::Update( double deltaTime, const InputManager& inputManager )
 
 	if( inputManager.m_Escape )
 	{
-		ChangeTransitionState( TransitionState::END );
+		m_TransitionManager.Init( TransitionState::END );
+		m_TransitionManager.StartTransition( std::bind( &Level::ExitLevel, this) );
 	}
 }
 
@@ -130,19 +126,7 @@ void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
 
 void Level::RenderTransitions( SDL_Renderer* renderer, const TextureManager& textureManager )
 {
-	SDL_Rect transitionRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
-
-	SDL_Texture* transitionTexture = textureManager.GetBackgroundTexture( 2 ).GetTexture();
-
-	SDL_SetTextureBlendMode( transitionTexture, SDL_BLENDMODE_BLEND );
-
-	Uint8 alphaValue = (m_CurrentTransitionTime / m_TransitionTime) * 255;
-
-	if( m_TransitionState == TransitionState::START ) alphaValue = 1 - alphaValue;
-
-	SDL_SetTextureAlphaMod( transitionTexture, alphaValue );
-
-	SDL_RenderCopy( renderer, transitionTexture, NULL, &transitionRect );
+	m_TransitionManager.RenderTransitions( renderer, textureManager );
 }
 
 void Level::RestartLevel()
@@ -158,11 +142,9 @@ void Level::RestartLevel()
 	m_CurrentTimer = m_Timer;
 }
 
-void Level::ChangeTransitionState( TransitionState stateToSet )
+void Level::ExitLevel()
 {
-	m_TransitionState = stateToSet;
-	m_CurrentTransitionTime = 0.0f;
-	m_IsTransitioning = true;
+	m_IsExit = true;
 }
 
 void Level::RenderScore( const FontManager& fontManager, SDL_Renderer* renderer )
