@@ -13,8 +13,8 @@
 
 Level::Level()
 	: m_EntityManager(
-		{ 2, 1000, glm::vec2( 250, 558 ), glm::vec2( 2, 2 ) },
-		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 2, 2 ) }
+		{ 2, 1000, glm::vec2( 60, 558 ), glm::vec2( 1.5, 1.5 ) },
+		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 1, 1 ) }
 	), m_Camera( { 0, 0 }, { 1, 1 })
 {
 	m_TransitionManager.Init( TransitionState::START );
@@ -43,6 +43,9 @@ void Level::HandleCollisions()
 {
 	auto entities = m_EntityManager.GetEntities();
 
+	auto& ball = m_EntityManager.GetBall();
+	auto& bat = m_EntityManager.GetBat();
+
 	for( int x = 0; x < entities.size(); x++ )
 	{
 		for( int y = 0; y < entities.size(); y++ )
@@ -52,6 +55,24 @@ void Level::HandleCollisions()
 			auto updateScoreFunc = std::bind( &ScoreManager::AddScore, &m_ScoreManager, std::placeholders::_1 );
 
 			entities[x].get().HandleCollisions( entities[y], updateScoreFunc );
+
+			// If the current entity is ball, then apply either random bounce or boost depending on the boost state of the bat.
+			if( entities[x].get().GetType() == BALL && ball.IsTouchingBat() )
+			{
+				if( !bat.IsBoostActive() ) 
+				{	
+					bat.DisableExpansion();
+					ball.RandomBounce();
+				}
+				else
+				{
+					int overlapMultiplier = (ball.GetCenter().x < bat.GetCenter().x ? -1 : 1);
+					float tOverlap = overlapMultiplier * ( 1 - ( ball.GetLastOverlap().overlapAmount.x / m_EntityManager.GetBat().GetBoundDetails().GetHalfBounds().x ) );
+					m_EntityManager.GetBall().ApplyBoost( tOverlap, bat.GetBoostForceAmount() );
+					bat.DisableBoost();
+					bat.EnableExpansion();
+				}
+			}
 		}
 	}
 }

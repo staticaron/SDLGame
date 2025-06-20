@@ -8,7 +8,7 @@
 #include "Entity.h"
 
 Entity::Entity( EntityType type, EntityDetails details )
-	: m_EntityDetails( details ), m_Type( type ), m_InitialDetails( details )
+	: m_EntityDetails( details ), m_Type( type ), m_DefaultDetails( details )
 {
 
 }
@@ -18,6 +18,7 @@ Entity::~Entity() {}
 void Entity::InitColliders( const TextureManager& textureManager )
 {
 	m_EntityBounds = EntityBounds( textureManager, m_EntityDetails );
+	m_DefaultBounds = m_EntityBounds;
 }
 
 void Entity::Update( double deltaTime, const InputManager& inputManager ) {}
@@ -26,12 +27,15 @@ void Entity::HandleCollisions( const Entity& entity, std::function<void(int)> up
 {
 	m_CollisionAndOverlap = DetectCollision( entity );
 
-	if( m_CollisionAndOverlap.IsColliding() && GetType() == BALL )
+	if( m_CollisionAndOverlap.IsColliding() )
 	{
-		AudioManager::Get().PlaySound(0, 0);
-
-		if( entity.GetType() == BAT ) updateScoreFunc( 1 );
 		ResolveCollision( entity );
+
+		if( GetType() == BALL && entity.GetType() == BAT )
+		{
+			AudioManager::Get().PlaySound(0, 0);
+			updateScoreFunc( 1 );
+		}
 	}
 }
 
@@ -47,27 +51,27 @@ void Entity::RenderImGui()
 		ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32( 255, 0, 0, 255 ) );
 	}
 
-	float maxArr[2] = { GetBoundPoint(BOTTOMRIGHT).x, GetBoundPoint(BOTTOMRIGHT).y };
 
 	std::string windowTitle = m_Type == BALL ? "Ball" : "Bat";
 	windowTitle += " Settings";
 
+	float midPoint[2] = { GetCenter().x, GetCenter().y };
+
 	ImGui::Begin( windowTitle.c_str() );
 	ImGui::Checkbox( "Show Bounds", &m_ShowBounds );
 	ImGui::BeginDisabled();
-	ImGui::InputFloat2( "Max Point", maxArr );
-	ImGui::Checkbox("IsGrounded", &m_IsGrounded);
+	ImGui::InputFloat2( "Mid Point", midPoint );
 	ImGui::EndDisabled();
 	ImGui::End();
 }
 
 void Entity::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) const
 {
-	SDL_Rect rect = { m_EntityDetails.pos.x, m_EntityDetails.pos.y, m_EntityBounds.bounds.x, m_EntityBounds.bounds.y };
+	SDL_Rect rect = { GetCenter().x - GetBoundDetails().GetHalfBounds().x, GetCenter().y - GetBoundDetails().GetHalfBounds().y, m_EntityBounds.bounds.x, m_EntityBounds.bounds.y};
 	SDL_RenderCopy( renderer, textureManager.GetTexture( m_EntityDetails.textureIndex ).GetTexture(), NULL, &rect);
 }
 
-AxisOverlap Entity::DetectCollision( const Entity& entity ) const
+AxisOverlap Entity::DetectCollision( const Entity& entity ) 
 {
 	AxisOverlap overlap;
 
@@ -93,7 +97,7 @@ void Entity::MaintainBounds() {}
 
 void Entity::ResetDetails()
 {
-	m_EntityDetails = m_InitialDetails;
+	m_EntityDetails = m_DefaultDetails;
 }
 
 void Entity::GroundCheck()

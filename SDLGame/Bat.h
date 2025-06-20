@@ -9,8 +9,26 @@ class Bat : public Entity
 	Bat(EntityDetails details);
 
 	void Update(double, const InputManager& inputManager) override;
+
+	void RenderImGui() override;
+
+	bool IsBoostActive() const { return m_BoostActive; };
+	void EnableBoost() { m_BoostActive = true; };
+	void DisableBoost() { m_BoostActive = false; };
+
+	void EnableExpansion();
+	void DisableExpansion();
+
+	float GetBoostForceAmount() const { return m_BoostForce; };
+
 	private:
-	int paddingX = 10;
+	int m_PaddingX = 10;
+
+	glm::vec2 m_BoostScaleMultiplier = { 2, 1 };
+
+	bool m_BoostActive = false;
+
+	float m_BoostForce = 1.5f;
 
 	void MaintainBounds() override;
 };

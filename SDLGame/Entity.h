@@ -69,7 +69,7 @@ public:
 	virtual void Render( SDL_Renderer* renderer, const TextureManager& ) const;
 	virtual void RenderImGui();
 
-	AxisOverlap DetectCollision( const Entity& entity ) const;
+	virtual AxisOverlap DetectCollision( const Entity& entity );
 	virtual void ResolveCollision( const Entity& );
 	virtual void MaintainBounds();
 
@@ -81,6 +81,8 @@ public:
 	std::array<glm::vec2, 4> GetBoundPoints() const;
 	glm::vec2 GetBoundPoint( BoundPointType type ) const;
 	glm::vec2 GetCenter() const;
+	EntityDetails GetEntityDetails() const { return m_EntityDetails; };
+	EntityBounds GetBoundDetails() const { return m_EntityBounds; };
 	EntityType GetType() const { return m_Type; }
 	bool IsGrounded() const { return m_IsGrounded; }
 
@@ -94,12 +96,13 @@ protected:
 
 	bool m_IsStatic = false;
 
-	EntityDetails m_InitialDetails;
+	EntityDetails m_DefaultDetails;
+	EntityBounds m_DefaultBounds;
 
 	AxisOverlap m_CollisionAndOverlap;
 	AxisOverlap m_PreviousCollisionAndOverlap;
 
 	EntityDetails m_EntityDetails;
 	EntityDetails m_PreviousEntityDetails;
-	EntityBounds m_EntityBounds = EntityBounds();
+	EntityBounds m_EntityBounds;
 };

@@ -11,7 +11,7 @@ class EntityManager
 	public:
 	EntityManager(EntityDetails batDetails, EntityDetails ballDetails);
 
-	Bat& GetBat(){ return m_Bat; };
+	Bat& GetBat() { return m_Bat; };
 	Ball& GetBall(){ return m_Ball; };
 
 	std::vector<std::reference_wrapper<Entity>> GetEntities();

@@ -23,8 +23,6 @@ void Ball::Update( double deltaTime, const InputManager& inputManager )
 
 	m_PreviousEntityDetails = m_EntityDetails;
 
-	if( inputManager.m_Space ) AddForce( { 0, -2 } );
-
 	m_EntityDetails.pos.x = m_EntityDetails.pos.x + m_VelocityX * deltaTime * m_EntityDetails.moveSpeed;
 
 	m_VelocityY = m_VelocityY + 2 * deltaTime;
@@ -35,64 +33,57 @@ void Ball::Update( double deltaTime, const InputManager& inputManager )
 	m_PreviousCollisionAndOverlap = m_CollisionAndOverlap;
 }
 
+AxisOverlap Ball::DetectCollision( const Entity& entity )
+{
+	m_IsTouchingBat = false; 
+
+	auto aO = Entity::DetectCollision( entity ); // Handle the base collision
+	if ( aO.IsColliding() && entity.GetType() == BAT ) 
+		m_IsTouchingBat = true;
+
+	m_LastAxisOverlap = aO;
+
+	return aO;
+}
+
 void Ball::ResolveCollision( const Entity& entity )
 {
 	if( !m_CollisionAndOverlap.IsColliding() ) return;
 
 	m_EntityDetails.pos.y -= m_CollisionAndOverlap.overlapAmount.y;
 	m_VelocityY = 0;
-
-	int minRange = -60;
-	int maxRange = 60;
-
-	if( m_CollisionAndOverlap.IsColliding() )
-	{
-		// If touching the walls, push the ball slightly to the opposite direction.
-		if( GetBoundPoint(BOTTOMLEFT).x <= Config::GetWindowPadding() )
-		{
-			minRange = 0;
-			maxRange = 30;
-		}
-		else if ( GetBoundPoint(BOTTOMRIGHT).x >= Config::GetWindowSize().x - Config::GetWindowPadding() )
-		{
-			minRange = -30;
-			maxRange = 0;
-		}
-
-		float randomRotation = glm::linearRand( minRange, maxRange );
-
-		glm::mat4 rotationMtx = glm::mat4( 1.0f );
-		rotationMtx = glm::rotate( rotationMtx, glm::radians( randomRotation ), glm::vec3( 0, 0, 1 ) );
-
-		glm::vec4 forceVector = rotationMtx * glm::vec4( glm::vec2{ 0, -1 }, 1, 1 );
-
-		AddForce( { forceVector.x, forceVector.y } );
-	}
 }
 
 void Ball::MaintainBounds()
 {
-	if( m_EntityDetails.pos.y + m_EntityBounds.bounds.y > 600 - paddingY )
+	if( m_EntityDetails.pos.y + m_EntityBounds.bounds.y > Config::GetWindowSize().y - Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.y = 600 - paddingY - m_EntityBounds.bounds.y;
+		m_EntityDetails.pos.y = Config::GetWindowSize().y - Config::GetWindowPadding() - m_EntityBounds.bounds.y;
 		m_VelocityY = 0;
 	}
-
-	if( m_EntityDetails.pos.x + m_EntityBounds.bounds.x > 800 - paddingY )
+	else if( GetBoundPoint(TOPLEFT).y < Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.x = 800 - paddingY - m_EntityBounds.bounds.x;
-		m_VelocityX = 0;
+		m_EntityDetails.pos.y = Config::GetWindowPadding();
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY;
 	}
-	else if( m_EntityDetails.pos.x < paddingY )
+
+	if( m_EntityDetails.pos.x + m_EntityBounds.bounds.x > Config::GetWindowSize().x - Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.x = paddingY;
-		m_VelocityX = 0;
+		m_EntityDetails.pos.x = Config::GetWindowSize().x - Config::GetWindowPadding() - m_EntityBounds.bounds.x;
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
+		else if ( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
+	}
+	else if( m_EntityDetails.pos.x < Config::GetWindowPadding() )
+	{
+		m_EntityDetails.pos.x = Config::GetWindowPadding();
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
+		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
 	}
 }
 
 void Ball::ResetDetails()
 {
-	m_EntityDetails = m_InitialDetails;
+	m_EntityDetails = m_DefaultDetails;
 	m_IsGrounded = false;
 	m_VelocityX = 0;
 	m_VelocityY = 0;
@@ -109,9 +100,59 @@ void Ball::RenderImGui()
 
 	ImGui::Begin(windowTitle.c_str());
 	ImGui::BeginDisabled();
-	ImGui::InputFloat2("Velocity", velocity);
+	ImGui::InputFloat2( "Velocity", velocity );
+	ImGui::Checkbox( "Is Touching Bat", &m_IsTouchingBat );
 	ImGui::EndDisabled();
 	ImGui::End();
+}
+
+void Ball::RandomBounce()
+{
+	m_VelocityY = 0;
+	m_VelocityX = 0;
+	m_CurrentBallState = BallState::BOUNCE;
+
+	int minRange = m_MinBounceAngle;
+	int maxRange = m_MaxBounceAngle;
+
+	if( m_CollisionAndOverlap.IsColliding() )
+	{
+		// If touching the walls, push the ball slightly to the opposite direction.
+		if( GetBoundPoint( BOTTOMLEFT ).x <= Config::GetWindowPadding() )
+		{
+			minRange = 0;
+			maxRange = 30;
+		}
+		else if( GetBoundPoint( BOTTOMRIGHT ).x >= Config::GetWindowSize().x - Config::GetWindowPadding() )
+		{
+			minRange = -30;
+			maxRange = 0;
+		}
+
+		float randomRotation = glm::linearRand( minRange, maxRange );
+
+		glm::mat4 rotationMtx = glm::mat4( 1.0f );
+		rotationMtx = glm::rotate( rotationMtx, glm::radians( randomRotation ), glm::vec3( 0, 0, 1 ) );
+
+		glm::vec4 forceVector = rotationMtx * glm::vec4( glm::vec2{ 0, -1 }, 1, 1 );
+
+		AddForce( { forceVector.x, forceVector.y } );
+	}
+}
+
+void Ball::ApplyBoost( float tOverlapAmount, float boostForce )
+{
+	m_CurrentBallState = BallState::BOOST;
+
+	tOverlapAmount = tOverlapAmount * 0.5 + 0.5;
+	float rotation = glm::mix( m_MinBoostAngle, m_MaxBoostAngle, tOverlapAmount );
+
+	glm::mat4 rotationMtx = glm::mat4( 1.0f );
+	rotationMtx = glm::rotate( rotationMtx, glm::radians( rotation ), glm::vec3( 0, 0, 1 ) );
+
+	glm::vec4 forceVector = rotationMtx * glm::vec4( glm::vec2{ 0, -1 }, 1, 1 );
+
+	AddForce( forceVector * boostForce );
 }
 
 void Ball::AddForce( glm::vec2 force )

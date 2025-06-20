@@ -58,7 +58,7 @@ void AudioManager::LoadMusic( const std::string& path )
 
 void AudioManager::PlaySound( int index, int times )
 {
-	SDL_assert( index > 0 && index < m_SoundList.size() );
+	SDL_assert( index >= 0 && index < m_SoundList.size() );
 
 	auto soundItem = m_SoundList.at(index);
 	Mix_PlayChannel(-1, soundItem, times);
