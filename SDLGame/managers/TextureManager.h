@@ -50,6 +50,8 @@ class TextureManager
 		"assets/textures/ball.png",
 		"assets/textures/tex2.png",
 		"assets/textures/bat.png",
+		"assets/textures/bat_large.png",
+		"assets/textures/diamond.png"
 	};
 
 	std::vector<std::string> m_BgTexturePaths = {

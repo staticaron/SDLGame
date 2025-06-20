@@ -14,7 +14,8 @@
 Level::Level()
 	: m_EntityManager(
 		{ 2, 1000, glm::vec2( 70, 558 ), glm::vec2( 1.5, 1.5 ) },
-		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 1, 1 ) }
+		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 1, 1 ) },
+		{ 4, 0, glm::vec2(420, 50), glm::vec2(1, 1)}
 	), m_Camera( { 0, 0 }, { 1, 1 })
 {
 	m_TransitionManager.Init( TransitionState::START );
@@ -35,6 +36,7 @@ void Level::InitColliders( const TextureManager& textureManager )
 {
 	m_EntityManager.GetBall().InitColliders( textureManager );
 	m_EntityManager.GetBat().InitColliders( textureManager );
+	m_EntityManager.GetDiamond().InitColliders( textureManager );
 
 	m_EntityManager.GetBall().MakeStatic();
 }
@@ -52,9 +54,7 @@ void Level::HandleCollisions()
 		{
 			if( x == y ) continue;
 
-			auto updateScoreFunc = std::bind( &ScoreManager::AddScore, &m_ScoreManager, std::placeholders::_1 );
-
-			entities[x].get().HandleCollisions( entities[y], updateScoreFunc );
+			entities[x].get().HandleCollisions( entities[y], [&](int scoreToAdd){ m_ScoreManager.AddScore(scoreToAdd); } );
 
 			// If the current entity is ball, then apply either random bounce or boost depending on the boost state of the bat.
 			if( entities[x].get().GetType() == BALL && ball.IsTouchingBat() )
@@ -103,6 +103,7 @@ void Level::Update( double deltaTime, const InputManager& inputManager )
 
 		m_EntityManager.GetBat().Update( deltaTime, inputManager );
 		m_EntityManager.GetBall().Update( deltaTime, inputManager );
+		m_EntityManager.GetDiamond().Update( deltaTime, inputManager );
 
 		if( m_EntityManager.GetBall().IsGrounded() ) {
 			AudioManager::Get().PlaySound(1, 0);
@@ -128,6 +129,7 @@ void Level::RenderImGui()
 	m_Camera.RenderImGui();
 	m_EntityManager.GetBall().RenderImGui();
 	m_EntityManager.GetBat().RenderImGui();
+	m_EntityManager.GetDiamond().RenderImGui();
 }
 
 void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
@@ -137,6 +139,7 @@ void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager
 
 	m_EntityManager.GetBat().Render( renderer, textureManager );
 	m_EntityManager.GetBall().Render( renderer, textureManager );
+	m_EntityManager.GetDiamond().Render( renderer, textureManager );
 }
 
 void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
@@ -178,6 +181,15 @@ void Level::RenderScore( const FontManager& fontManager, SDL_Renderer* renderer 
 	SDL_RenderCopy( renderer, container.GetTexture(), NULL, &fontRect);
 
 	container.Destroy();
+
+	std::string highScoreValue = std::to_string( m_ScoreManager.GetHighScore() );
+	TextureContainer highScoreContainer = fontManager.GetTextureFromFont( renderer, 0, highScoreValue.c_str(), SDL_Color{ 200, 200, 200 } );
+
+	SDL_Rect highScoreRect = { Config::GetWindowSize().x - Config::GetWindowPadding() - highScoreContainer.GetDimensions().x * 0.5f, container.GetDimensions().y, highScoreContainer.GetDimensions().x * 0.5, highScoreContainer.GetDimensions().y * 0.5};
+
+	SDL_RenderCopy( renderer, highScoreContainer.GetTexture(), NULL, &highScoreRect );
+
+	highScoreContainer.Destroy();
 }
 
 void Level::RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer )

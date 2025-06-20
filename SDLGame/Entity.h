@@ -53,7 +53,8 @@ enum BoundPointType
 enum EntityType
 {
 	BALL,
-	BAT
+	BAT,
+	DIAMOND
 };
 
 class Entity

@@ -64,20 +64,20 @@ void Ball::MaintainBounds()
 	else if( GetBoundPoint(TOPLEFT).y < Config::GetWindowPadding() )
 	{
 		SetBoundPoint( TOPLEFT, { GetBoundPoint(TOPLEFT).x, Config::GetWindowPadding() });
-		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY;
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY * m_BoostWallCollisionDampening;
 	}
 
 	if( GetBoundPoint(BOTTOMRIGHT).x > Config::GetWindowSize().x - Config::GetWindowPadding() )
 	{
 		SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint(BOTTOMRIGHT).y});
-		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
-		else if ( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
+		else if ( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
 	}
 	else if( GetBoundPoint(TOPLEFT).x < Config::GetWindowPadding() )
 	{
 		SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint(TOPLEFT).y } );
-		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
-		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
+		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
+		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
 	}
 }
 

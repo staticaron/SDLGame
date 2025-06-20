@@ -6,10 +6,7 @@
 
 #include "managers/config.h"
 
-Bat::Bat( EntityDetails details )
-	: Entity( EntityType::BAT, details )
-{
-}
+Bat::Bat( EntityDetails details ) : Entity( EntityType::BAT, details ) {}
 
 void Bat::Update( double deltaTime, const InputManager& inputManager )
 {
@@ -35,6 +32,15 @@ void Bat::Update( double deltaTime, const InputManager& inputManager )
 	MaintainBounds();
 }
 
+void Bat::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) const
+{
+	SDL_Rect rect = { GetCenter().x - GetBoundDetails().GetHalfBounds().x, GetCenter().y - GetBoundDetails().GetHalfBounds().y, m_EntityBounds.bounds.x, m_EntityBounds.bounds.y };
+
+	const auto& tex = m_Expanded == false ? textureManager.GetTexture( m_EntityDetails.textureIndex ).GetTexture() : textureManager.GetTexture( m_EntityDetails.textureIndex + 1 ).GetTexture();
+
+	SDL_RenderCopy( renderer, tex, NULL, &rect );
+}
+
 void Bat::RenderImGui()
 {
 	Entity::RenderImGui();
@@ -53,6 +59,8 @@ void Bat::EnableExpansion()
 	glm::vec2 newBounds = m_DefaultBounds.bounds * m_BoostScaleMultiplier;
 	m_EntityDetails.scale = newScale;
 	m_EntityBounds.bounds = newBounds;
+
+	m_Expanded = true;
 }
 
 void Bat::DisableExpansion()
@@ -61,6 +69,8 @@ void Bat::DisableExpansion()
 	glm::vec2 newBounds = m_DefaultBounds.bounds;
 	m_EntityDetails.scale = newScale;
 	m_EntityBounds.bounds = newBounds;
+
+	m_Expanded = false;
 }
 
 void Bat::MaintainBounds()

@@ -159,6 +159,7 @@
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Bat.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Diamond.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
@@ -485,6 +486,7 @@
     <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="include\inih\ini.h" />
     <ClInclude Include="include\inih\INIReader.h" />
+    <ClInclude Include="include\mIni\ini.h" />
     <ClInclude Include="include\SDL\SDL_config_emscripten.h" />
     <ClInclude Include="include\SDL\SDL_config_ngage.h" />
     <ClInclude Include="include\SDL\SDL_config_os2.h" />
@@ -496,6 +498,7 @@
     <ClInclude Include="levels\MainMenu.h" />
     <ClInclude Include="managers\AudioManager.h" />
     <ClInclude Include="managers\config.h" />
+    <ClInclude Include="Diamond.h" />
     <ClInclude Include="managers\EntityManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="include\SDL\SDL_image.h" />

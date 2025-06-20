@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.h"
+
 class ScoreManager
 {
 	public:
@@ -7,6 +9,7 @@ class ScoreManager
 	~ScoreManager();
 
 	int GetScore() const { return m_Score; };
+	int GetHighScore() const { return Config::GetHighScore(); };
 	void AddScore(int);
 
 	void ResetScore();

@@ -41,6 +41,9 @@ private:
 	float m_MinBoostAngle = -40;
 	float m_MaxBoostAngle = 40;
 
+	float m_BoostWallCollisionDampening = 0.8f;
+	float m_BounceWallCollisionDampening = 0.3f;
+
 	BallState m_CurrentBallState = BallState::BOUNCE;
 	AxisOverlap m_LastAxisOverlap;
 };

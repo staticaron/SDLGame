@@ -1,5 +1,7 @@
 #include "ScoreManager.h"
 
+#include "config.h"
+
 ScoreManager::ScoreManager()
 {
 }
@@ -15,5 +17,10 @@ void ScoreManager::AddScore(int scoreToAdd)
 
 void ScoreManager::ResetScore()
 {
+	if( m_Score > Config::GetHighScore() )
+	{
+		Config::UpdateMaxScore( m_Score );
+	}
+
 	m_Score = 0;
 }

@@ -10,6 +10,7 @@ class Bat : public Entity
 
 	void Update(double, const InputManager& inputManager) override;
 
+	void Render( SDL_Renderer* renderer, const TextureManager& ) const override;
 	void RenderImGui() override;
 
 	bool IsBoostActive() const { return m_BoostActive; };
@@ -26,9 +27,9 @@ class Bat : public Entity
 
 	glm::vec2 m_BoostScaleMultiplier = { 2, 1 };
 
+	float m_BoostForce = 2.0f;
 	bool m_BoostActive = false;
-
-	float m_BoostForce = 1.5f;
+	bool m_Expanded = false;
 
 	void MaintainBounds() override;
 };

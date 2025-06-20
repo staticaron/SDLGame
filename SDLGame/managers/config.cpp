@@ -1,20 +1,38 @@
 #include "config.h"
 
-#include <filesystem>
+#include <string>
 
 glm::vec2 Config::m_WindowSize;
 int Config::m_WindowPadding;
+int Config::m_HighScore;
 
 void Config::Init()
 {
-	INIReader reader = INIReader( "config.ini" );
+	mINI::INIFile file( "config.ini");
 
-	if( reader.ParseError() < 0 )
+	mINI::INIStructure ini;
+
+	file.read( ini );
+
+	m_WindowPadding = std::stoi( ini["window"]["padding"] );
+	m_WindowSize = { std::stoi( ini["window"]["width"]), std::stoi( ini["window"]["height"]) };
+	m_HighScore = std::stoi( ini["score"]["highscore"]);
+}
+
+void Config::UpdateMaxScore( int highScore )
+{
+	mINI::INIFile file( "config.ini" );
+
+	mINI::INIStructure ini;
+
+	file.read( ini );
+
+	if( highScore > std::stoi( ini["score"]["highscore"] ) )
 	{
-		std::cout << "Error while parsing config.ini file " << std::endl;
-		return;
+		ini["score"]["highscore"] = std::to_string( highScore );
+		m_HighScore = highScore;
+		file.write( ini );
 	}
 
-	m_WindowSize = { reader.GetInteger( "window", "width", -1 ), reader.GetInteger( "window", "height", -1 ) };
-	m_WindowPadding = reader.GetInteger( "window", "padding", -1 );
+	std::cout << "config.h written successfully!" << std::endl;
 }
