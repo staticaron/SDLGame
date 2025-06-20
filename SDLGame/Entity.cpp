@@ -43,9 +43,9 @@ void Entity::RenderImGui()
 {
 	if( m_ShowBounds )
 	{
-		auto min = m_EntityDetails.pos;
-		auto max = m_EntityDetails.pos + m_EntityBounds.bounds;
-		auto middle = m_EntityDetails.pos + m_EntityBounds.GetHalfBounds();
+		auto min = GetBoundPoint( TOPLEFT );
+		auto max = GetBoundPoint( BOTTOMRIGHT );
+		auto middle = GetCenter();
 
 		ImGui::GetForegroundDrawList()->AddRect( { min.x, min.y }, { max.x, max.y }, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
 		ImGui::GetForegroundDrawList()->AddCircleFilled( { GetCenter().x, GetCenter().y }, 3, IM_COL32( 255, 0, 0, 255 ) );
@@ -118,10 +118,17 @@ std::array<glm::vec2, 4> Entity::GetBoundPoints() const
 
 glm::vec2 Entity::GetBoundPoint( BoundPointType type ) const
 {
-	return glm::vec2( m_EntityDetails.pos.x + (type == TOPRIGHT || type == BOTTOMRIGHT ? m_EntityBounds.bounds.x : 0), m_EntityDetails.pos.y + (type == BOTTOMRIGHT || type == BOTTOMLEFT ? m_EntityBounds.bounds.y : 0) );
+	return glm::vec2( m_EntityDetails.pos.x + (type == TOPRIGHT || type == BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().x, m_EntityDetails.pos.y + (type == BOTTOMLEFT || type == BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().y );
 }
 
 glm::vec2 Entity::GetCenter() const
 {
-	return glm::vec2( m_EntityDetails.pos + m_EntityBounds.bounds * 0.5f );
+	// return glm::vec2( m_EntityDetails.pos + m_EntityBounds.bounds * 0.5f );
+	return m_EntityDetails.pos;
+}
+
+void Entity::SetBoundPoint( BoundPointType type, glm::vec2 pos )
+{
+	m_EntityDetails.pos.x = pos.x + ( type == TOPLEFT || type == BOTTOMLEFT ? 1 : -1 ) * GetBoundDetails().GetHalfBounds().x;
+	m_EntityDetails.pos.y = pos.y + ( type == BOTTOMLEFT || type == BOTTOMRIGHT ? -1 : 1 ) * GetBoundDetails().GetHalfBounds().y;
 }

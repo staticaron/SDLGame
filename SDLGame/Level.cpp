@@ -13,7 +13,7 @@
 
 Level::Level()
 	: m_EntityManager(
-		{ 2, 1000, glm::vec2( 60, 558 ), glm::vec2( 1.5, 1.5 ) },
+		{ 2, 1000, glm::vec2( 70, 558 ), glm::vec2( 1.5, 1.5 ) },
 		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 1, 1 ) }
 	), m_Camera( { 0, 0 }, { 1, 1 })
 {

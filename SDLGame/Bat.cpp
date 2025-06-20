@@ -65,6 +65,6 @@ void Bat::DisableExpansion()
 
 void Bat::MaintainBounds()
 {
-	if( m_EntityDetails.pos.x < Config::GetWindowPadding() ) m_EntityDetails.pos.x = Config::GetWindowPadding();
-	if( m_EntityDetails.pos.x + m_EntityBounds.bounds.x > Config::GetWindowSize().x - Config::GetWindowPadding() ) m_EntityDetails.pos.x = Config::GetWindowSize().x - Config::GetWindowPadding() - m_EntityBounds.bounds.x;
+	if( GetBoundPoint( TOPLEFT ).x < Config::GetWindowPadding() ) SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint( TOPLEFT ).y } );
+	if( GetBoundPoint( BOTTOMRIGHT ).x > Config::GetWindowSize().x - Config::GetWindowPadding() ) SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint( BOTTOMRIGHT ).y });
 }

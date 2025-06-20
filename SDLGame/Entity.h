@@ -76,7 +76,6 @@ public:
 	virtual void ResetDetails();
 	virtual void GroundCheck();
 
-
 	// Getters and Setters
 	std::array<glm::vec2, 4> GetBoundPoints() const;
 	glm::vec2 GetBoundPoint( BoundPointType type ) const;
@@ -88,6 +87,8 @@ public:
 
 	void MakeStatic() { m_IsStatic = true; }
 	void MakeDynamic() { m_IsStatic = false; }
+
+	void SetBoundPoint( BoundPointType, glm::vec2 );
 
 protected:
 	EntityType m_Type;

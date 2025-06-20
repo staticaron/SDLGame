@@ -56,26 +56,26 @@ void Ball::ResolveCollision( const Entity& entity )
 
 void Ball::MaintainBounds()
 {
-	if( m_EntityDetails.pos.y + m_EntityBounds.bounds.y > Config::GetWindowSize().y - Config::GetWindowPadding() )
+	if( GetBoundPoint(BOTTOMRIGHT).y > Config::GetWindowSize().y - Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.y = Config::GetWindowSize().y - Config::GetWindowPadding() - m_EntityBounds.bounds.y;
+		SetBoundPoint( BOTTOMRIGHT, { GetBoundPoint(BOTTOMRIGHT).x, Config::GetWindowSize().y - Config::GetWindowPadding() });
 		m_VelocityY = 0;
 	}
 	else if( GetBoundPoint(TOPLEFT).y < Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.y = Config::GetWindowPadding();
+		SetBoundPoint( TOPLEFT, { GetBoundPoint(TOPLEFT).x, Config::GetWindowPadding() });
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY;
 	}
 
-	if( m_EntityDetails.pos.x + m_EntityBounds.bounds.x > Config::GetWindowSize().x - Config::GetWindowPadding() )
+	if( GetBoundPoint(BOTTOMRIGHT).x > Config::GetWindowSize().x - Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.x = Config::GetWindowSize().x - Config::GetWindowPadding() - m_EntityBounds.bounds.x;
+		SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint(BOTTOMRIGHT).y});
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
 		else if ( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
 	}
-	else if( m_EntityDetails.pos.x < Config::GetWindowPadding() )
+	else if( GetBoundPoint(TOPLEFT).x < Config::GetWindowPadding() )
 	{
-		m_EntityDetails.pos.x = Config::GetWindowPadding();
+		SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint(TOPLEFT).y } );
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX;
 		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = 0;
 	}
