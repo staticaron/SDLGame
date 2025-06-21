@@ -14,7 +14,7 @@ struct TextureContainer
 	TextureContainer() : m_Texture( NULL ), m_Dimensions( { -1, -1 } ) {}
 	TextureContainer(SDL_Texture* texture, int width, int height ) : m_Texture( texture ), m_Dimensions( { width, height } ) {}
 
-	void Destroy()
+	void Destroy() const
 	{
 		if(m_Texture != NULL) SDL_DestroyTexture( m_Texture );
 	}

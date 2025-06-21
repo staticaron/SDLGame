@@ -103,12 +103,27 @@ bool Game::Update( double deltaTime )
 	case MAINMENU:
 		m_MainMenuLevel->Update( deltaTime, m_InputManager );
 
-		if( m_MainMenuLevel->GetQuitStatus() ) m_Quit = true;
-		else if( m_MainMenuLevel->GetStartGameStatus() )
+		if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::QUIT ) m_Quit = true;
+		else if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::STARTGAME )
 		{
 			ChangeGameState( LEVEL );
 			return false;
 		}
+		else if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::ABOUT )
+		{
+			ChangeGameState( ABOUT );
+			return false;
+		}
+		break;
+	case ABOUT:
+		m_AboutLevel->Update( deltaTime, m_InputManager );
+
+		if( m_AboutLevel->GetAction() == AboutAction::MAINMENU )
+		{
+			ChangeGameState( MAINMENU );
+			return false;
+		}
+
 		break;
 	case LEVEL:
 		m_CurrentLevel->Update( deltaTime, m_InputManager );
@@ -134,11 +149,10 @@ void Game::HandleCollisions()
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
-		break;
+	case MAINMENU: break;
+	case ABOUT : break;
 	case LEVEL:
-		m_CurrentLevel->HandleCollisions();
-		break;
+		m_CurrentLevel->HandleCollisions(); break;
 	default:
 		break;
 	}
@@ -162,15 +176,14 @@ void Game::RenderImGui()
 	switch( m_CurrentGameState )
 	{
 	case MAINMENU:
-		m_MainMenuLevel->RenderImGui( m_Renderer );
-		break;
+		m_MainMenuLevel->RenderImGui( m_Renderer ); break;
+	case ABOUT:
+		m_AboutLevel->RenderImGui(); break;
 	case LEVEL:
-		m_CurrentLevel->RenderImGui();
-		break;
+		m_CurrentLevel->RenderImGui(); break;
 	default:
 		break;
 	}
-
 }
 
 void Game::RenderEverything()
@@ -195,11 +208,11 @@ void Game::RenderUI()
 	switch( m_CurrentGameState )
 	{
 	case MAINMENU:
-		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager );
-		break;
+		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager ); break;
+	case ABOUT:
+		m_AboutLevel->RenderUI( m_Renderer, m_FontManager ); break;
 	case LEVEL:
-		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager );
-		break;
+		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager ); break;
 	default:
 		break;
 	}
@@ -207,13 +220,16 @@ void Game::RenderUI()
 
 void Game::RenderTransitions()
 {
-	if( m_CurrentGameState == LEVEL )
+	switch( m_CurrentGameState )
 	{
-		m_CurrentLevel->RenderTransitions( m_Renderer, m_TextureManager );
-	}
-	else if( m_CurrentGameState == MAINMENU )
-	{
-		m_MainMenuLevel->RenderTransitions( m_Renderer, m_TextureManager );
+		case MAINMENU:
+			m_MainMenuLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
+		case ABOUT:
+			m_AboutLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
+		case LEVEL:
+			m_CurrentLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
+		default:
+			break;
 	}
 }
 
@@ -222,11 +238,11 @@ void Game::RenderGeometry()
 	switch( m_CurrentGameState )
 	{
 	case MAINMENU:
-		m_MainMenuLevel->Render( m_Renderer, m_TextureManager );
-		break;
+		m_MainMenuLevel->Render( m_Renderer, m_TextureManager ); break;
+	case ABOUT:
+		m_AboutLevel->Render( m_Renderer, m_TextureManager ); break;
 	case LEVEL:
-		m_CurrentLevel->Render( m_Renderer, m_TextureManager );
-		break;
+		m_CurrentLevel->Render( m_Renderer, m_TextureManager ); break;
 	default:
 		break;
 	}
@@ -238,6 +254,9 @@ void Game::ChangeGameState( GameState gameStateToChangeTo )
 
 	if( gameStateToChangeTo == LEVEL )
 	{
+		if( m_MainMenuLevel != NULL ) m_MainMenuLevel->Unload();
+		if( m_AboutLevel != NULL ) m_AboutLevel->Unload();
+		
 		m_CurrentLevel = std::make_unique<Level>();
 		m_CurrentLevel->InitColliders( m_TextureManager );
 		m_CurrentGameState = LEVEL;
@@ -245,7 +264,17 @@ void Game::ChangeGameState( GameState gameStateToChangeTo )
 	else if ( gameStateToChangeTo == MAINMENU )
 	{
 		if( m_CurrentLevel != NULL ) m_CurrentLevel->Unload();
+		if( m_AboutLevel != NULL ) m_AboutLevel->Unload();
+
 		m_MainMenuLevel = std::make_unique<MainMenu>();
 		m_CurrentGameState = MAINMENU;
+	}
+	else if( gameStateToChangeTo == ABOUT )
+	{
+		if( m_CurrentGameState != NULL ) m_CurrentLevel->Unload();
+		if( m_MainMenuLevel != NULL ) m_MainMenuLevel->Unload();
+
+		m_AboutLevel = std::make_unique<About>();
+		m_CurrentGameState = ABOUT;
 	}
 }

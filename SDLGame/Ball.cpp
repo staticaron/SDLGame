@@ -48,6 +48,8 @@ AxisOverlap Ball::DetectCollision( const Entity& entity )
 
 void Ball::ResolveCollision( const Entity& entity )
 {
+	if( entity.GetType() == DIAMOND ) return; 
+
 	if( !m_CollisionAndOverlap.IsColliding() ) return;
 
 	m_EntityDetails.pos.y -= m_CollisionAndOverlap.overlapAmount.y;

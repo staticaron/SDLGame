@@ -36,12 +36,12 @@ private:
 	float m_VelocityX, m_VelocityY;
 	bool m_IsTouchingBat = false;
 
-	float m_MinBounceAngle = -50;
-	float m_MaxBounceAngle = 50;
+	float m_MinBounceAngle = -10;
+	float m_MaxBounceAngle = 10;
 	float m_MinBoostAngle = -40;
 	float m_MaxBoostAngle = 40;
 
-	float m_BoostWallCollisionDampening = 0.8f;
+	float m_BoostWallCollisionDampening = 0.5f;
 	float m_BounceWallCollisionDampening = 0.3f;
 
 	BallState m_CurrentBallState = BallState::BOUNCE;

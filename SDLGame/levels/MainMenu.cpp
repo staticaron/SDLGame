@@ -79,6 +79,13 @@ void MainMenu::RenderTransitions( SDL_Renderer* renderer, const TextureManager& 
 	m_TransitionManager.RenderTransitions( renderer, textureManager );
 }
 
+void MainMenu::RenderImGui() {}
+
+void MainMenu::Unload()
+{
+	std::cout << "MainMenu Unloaded!" << std::endl;
+}
+
 void MainMenu::RenderImGui( SDL_Renderer* )
 {
 	for( auto& [index, buttonDetails] : m_Buttons )
@@ -97,6 +104,8 @@ void MainMenu::StartButtonCallback()
 
 void MainMenu::AboutButtonCallback()
 {
+	m_TransitionManager.Init( TransitionState::END );
+	m_TransitionManager.StartTransition( [this](){ this->About(); } ); 
 }
 
 void MainMenu::QuitButtonCallback()
@@ -107,10 +116,15 @@ void MainMenu::QuitButtonCallback()
 
 void MainMenu::StartGame()
 {
-	m_StartGame = true;
+	m_ActionTaken = MainMenuAction::STARTGAME;
+}
+
+void MainMenu::About()
+{
+	m_ActionTaken = MainMenuAction::ABOUT;
 }
 
 void MainMenu::QuitGame()
 {
-	m_Quit = true;
+	m_ActionTaken = MainMenuAction::QUIT;
 }

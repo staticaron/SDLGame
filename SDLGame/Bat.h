@@ -13,6 +13,8 @@ class Bat : public Entity
 	void Render( SDL_Renderer* renderer, const TextureManager& ) const override;
 	void RenderImGui() override;
 
+	void ResetDetails() override;
+
 	bool IsBoostActive() const { return m_BoostActive; };
 	void EnableBoost() { m_BoostActive = true; };
 	void DisableBoost() { m_BoostActive = false; };

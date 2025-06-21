@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/random.hpp"
 
+#include "managers/AudioManager.h"
+
 Diamond::Diamond( EntityDetails details ) : Entity( EntityType::DIAMOND, details) {}
 
 void Diamond::ResetDiamond()
@@ -18,5 +20,7 @@ void Diamond::HandleCollisions( const Entity& entity, std::function<void( int )>
 	{
 		ResetDiamond();
 		updateScoreFunc( 10 );
+
+		AudioManager::Get().PlaySound( 4, 0 );
 	}
 }

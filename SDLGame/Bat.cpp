@@ -53,6 +53,13 @@ void Bat::RenderImGui()
 
 }
 
+void Bat::ResetDetails()
+{
+	Entity::ResetDetails();
+
+	if( m_Expanded ) DisableExpansion(); 
+}
+
 void Bat::EnableExpansion()
 {
 	glm::vec2 newScale = m_DefaultDetails.scale * m_BoostScaleMultiplier;

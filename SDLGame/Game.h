@@ -7,6 +7,7 @@
 
 #include "Level.h"
 #include "levels/MainMenu.h"
+#include "levels/About.h"
 #include "managers/TextureManager.h"
 #include "managers/InputManager.h"
 #include "managers/ScoreManager.h"
@@ -15,6 +16,7 @@
 enum GameState
 {
 	MAINMENU,
+	ABOUT,
 	LEVEL
 };
 
@@ -37,6 +39,7 @@ private:
 
 	std::unique_ptr<MainMenu> m_MainMenuLevel = NULL;
 	std::unique_ptr<Level> m_CurrentLevel = NULL;
+	std::unique_ptr<About> m_AboutLevel = NULL;
 
 	Uint64 NOW = 0;
 	Uint64 LAST = SDL_GetPerformanceCounter();;

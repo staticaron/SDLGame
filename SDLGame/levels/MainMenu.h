@@ -13,10 +13,19 @@
 #include "../managers/FontManager.h"
 #include "../managers/TextureManager.h"
 #include "../managers/TransitionManager.h"
+#include "../levels/ILevel.h"
 
 enum class ButtonState
 {
 	HOVERED,
+	NONE
+};
+
+enum class MainMenuAction
+{
+	STARTGAME, 
+	ABOUT,
+	QUIT,
 	NONE
 };
 
@@ -30,17 +39,19 @@ struct MainMenuButton
 	std::function<void()> pressCallback;
 };
 
-class MainMenu
+class MainMenu : public ILevel
 {
 public:
 	MainMenu();
 	~MainMenu();
 
 	void Update( double, const InputManager& );
-
 	void Render( SDL_Renderer*, const TextureManager& );
 	void RenderUI( SDL_Renderer*, const FontManager& );
 	void RenderTransitions( SDL_Renderer*, const TextureManager& );
+	void RenderImGui(); 
+
+	void Unload();
 
 	void RenderImGui( SDL_Renderer* );
 
@@ -49,19 +60,17 @@ public:
 	void QuitButtonCallback();
 
 	void StartGame();
+	void About();
 	void QuitGame();
 
-	// Getters and Setters
-	bool GetQuitStatus() const { return m_Quit; };
-	bool GetStartGameStatus() const { return m_StartGame; };
+	MainMenuAction GetMainMenuAction() const { return m_ActionTaken; };
 
 private:
 	std::map<int, MainMenuButton> m_Buttons;
 
 	TransitionManager m_TransitionManager;
 
-	bool m_Quit = false;
-	bool m_StartGame = false;
+	MainMenuAction m_ActionTaken = MainMenuAction::NONE;
 
 	SDL_Color m_NormalColor = SDL_Color{ 200, 200, 200, 255 };
 	SDL_Color m_HoverColor = SDL_Color{ 100, 100, 100, 255 };

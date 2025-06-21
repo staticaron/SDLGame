@@ -17,6 +17,7 @@ void AudioManager::Init()
 	LoadSound("assets/sounds/death.wav");
 	LoadSound("assets/sounds/count.wav");
 	LoadSound("assets/sounds/countFinal.wav");
+	LoadSound("assets/sounds/diamond.wav");
 	LoadMusic("assets/musics/bg.ogg");
 }
 
@@ -74,7 +75,7 @@ void AudioManager::PlayMusic( int index )
 
 void AudioManager::SetSoundVolume( int checkIndex, float percentage )
 {
-	SDL_assert( checkIndex < -1 );
+	SDL_assert( checkIndex >= -1 );
 
 	std::cout << "Settings SFX Volume" << std::endl;
 

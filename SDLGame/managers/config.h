@@ -13,7 +13,7 @@ public:
 	
 	static void UpdateMaxScore( int highScore );
 
-	static glm::vec2 GetWindowSize() { return m_WindowSize; }
+	static glm::ivec2 GetWindowSize() { return m_WindowSize; }
 	static int GetWindowPadding() { return m_WindowPadding; };
 	static int GetHighScore() { return m_HighScore; };
 
