@@ -5,6 +5,8 @@
 #include "SDL/SDL.h"
 #include "glm/glm.hpp"
 
+#include "config.h"
+
 void AudioManager::Init()
 {
 	if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
@@ -18,6 +20,7 @@ void AudioManager::Init()
 	LoadSound("assets/sounds/count.wav");
 	LoadSound("assets/sounds/countFinal.wav");
 	LoadSound("assets/sounds/diamond.wav");
+	LoadSound("assets/sounds/wallhit.wav");
 
 	LoadMusic("assets/musics/bg.ogg");
 	LoadMusic("assets/musics/Blaster.ogg");
@@ -78,6 +81,29 @@ void AudioManager::PlayMusic( int index )
 
 	auto musicItem = m_MusicList.at( index );
 	Mix_PlayMusic( musicItem, -1 );
+
+	m_MusicPlayingIndex = index;
+
+	Config::UpdateMusic( index );
+}
+
+void AudioManager::LoadVolumes( float* musicVolume, float* soundVolume )
+{
+	*soundVolume = Config::GetSoundVolume() / (float)MIX_MAX_VOLUME;
+	SetAllSoundVolume( *soundVolume );
+
+	*musicVolume = Config::GetMusicVolume() / (float)MIX_MAX_VOLUME;
+	SetMusicVolume( *musicVolume );
+}
+
+void AudioManager::SetAllSoundVolume( float percentage )
+{
+	for( int x = 0; x < m_SoundList.size(); x++ )
+	{
+		Mix_VolumeChunk( m_SoundList.at( x ), MIX_MAX_VOLUME * percentage );
+	}
+
+	Config::UpdateVolume( -1, MIX_MAX_VOLUME * percentage );
 }
 
 void AudioManager::SetSoundVolume( int checkIndex, float percentage )
@@ -90,6 +116,8 @@ void AudioManager::SetSoundVolume( int checkIndex, float percentage )
 		for( auto chunk : m_SoundList ) Mix_VolumeChunk( chunk, MIX_MAX_VOLUME * percentage );
 	else
 		Mix_VolumeChunk( m_SoundList.at( checkIndex ), MIX_MAX_VOLUME * percentage );
+
+	Config::UpdateVolume( -1, MIX_MAX_VOLUME * percentage );
 }
 
 void AudioManager::SetMusicVolume(float percentage)
@@ -99,4 +127,6 @@ void AudioManager::SetMusicVolume(float percentage)
 	percentage = glm::clamp(percentage, 0.0f, 1.0f);
 
 	Mix_VolumeMusic(MIX_MAX_VOLUME * percentage);
+
+	Config::UpdateVolume( MIX_MAX_VOLUME * percentage, -1 );
 }

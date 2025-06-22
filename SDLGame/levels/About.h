@@ -35,6 +35,8 @@ private:
 
 	int m_CurrentMusicIndex = 0;
 
+	int m_ButtonWidthAdditive = -17;
+
 	SDL_Color m_NormalColor = SDL_Color{ 200, 200, 200, 255 };
 	SDL_Color m_HoverColor = SDL_Color{ 100, 100, 100, 255 };
 };

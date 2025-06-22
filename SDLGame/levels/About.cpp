@@ -13,7 +13,7 @@ About::About()
 	m_TransitionManager.Init( TransitionState::START );
 	m_TransitionManager.StartTransition( []() {} );
 
-	m_MainDimensions = { 300, 140 };
+	m_MainDimensions = { 300, 230 };
 }
 
 About::~About() {}
@@ -37,14 +37,16 @@ void About::Render( SDL_Renderer* renderer, const TextureManager& textureManager
 
 void About::RenderImGui() 
 {
-	
+	ImGui::Begin( "About Settings" );
+	ImGui::InputInt( "Button Width Additive", &m_ButtonWidthAdditive );
+	ImGui::End();
 }
 
 void About::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, const TextureManager& textureManager)
 {
 	std::string aboutHeading = "ABOUT";
 	auto headingTex = fontManager.GetTextureFromFont( renderer, 0, aboutHeading.c_str(), m_NormalColor );
-	auto headingRect = SDL_Rect( Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - headingTex.GetDimensions().x * 0.5f, 0, headingTex.GetDimensions().x, headingTex.GetDimensions().y );
+	auto headingRect = SDL_Rect( Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - headingTex.GetDimensions().x * 0.5f, 50, headingTex.GetDimensions().x, headingTex.GetDimensions().y );
 
 	SDL_RenderCopy( renderer, headingTex.GetTexture(), NULL, &headingRect );
 
@@ -57,14 +59,22 @@ void About::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, co
 	ImGui::PushStyleVar( ImGuiStyleVar_WindowBorderSize, 0.0f );
 	ImGui::Begin( "About Menu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove );
 
+	ImGui::PushStyleVar( ImGuiStyleVar_FrameBorderSize, 2.0f );
+
 	std::string currentlySelected = "MUSIC " + std::to_string( m_CurrentMusicIndex + 1 );
 
 	ImGui::SetNextItemWidth(-1);
+
+	ImGui::PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2(
+		ImGui::GetStyle().FramePadding.x,
+		12.0f
+	) );
+
 	if( ImGui::BeginCombo( "##Background MUSIC", currentlySelected.c_str() ) )
 	{
 		for( int x = 0; x < AudioManager::Get().GetMusicCount(); x++ )
 		{
-			std::string itemName = "MUSIC" + std::to_string( x + 1 );
+			std::string itemName = "MUSIC " + std::to_string( x + 1 );
 			bool isSelected = m_CurrentMusicIndex == x;
 			if( ImGui::Selectable( itemName.c_str(), isSelected ) )
 			{
@@ -78,8 +88,10 @@ void About::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, co
 
 		ImGui::EndCombo();
 	}
+
+	ImGui::PopStyleVar(1);
 	
-	if( ImGui::Button( "MUSIC SOURCE", {ImGui::GetWindowWidth() - 15, 30}) )
+	if( ImGui::Button( "MUSIC SOURCE", {ImGui::GetWindowWidth() + m_ButtonWidthAdditive, 30}) )
 	{
 		std::string url = "https://swarajthegreat.itch.io/8-bit-arcade-pack";
 		ShellExecuteA( NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL );
@@ -87,11 +99,21 @@ void About::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, co
 
 	ImGui::Separator();
 
-	if( ImGui::Button( "SDL2", { ImGui::GetWindowWidth() - 15, 50 } ) )
+	if( ImGui::Button( "SDL2", { ImGui::GetWindowWidth() + m_ButtonWidthAdditive, 50 } ) )
 	{
 		std::string url = "https://www.libsdl.org/";
 		ShellExecuteA( NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL );
 	}
+
+	ImGui::Separator();
+
+	if( ImGui::Button( "Source Code", { ImGui::GetWindowWidth() + m_ButtonWidthAdditive, 50 } ) )
+	{
+		std::string url = "https://github.com/staticaron/SDLGame";
+		ShellExecuteA( NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL );
+	}
+
+	ImGui::PopStyleVar(1);
 
 	ImGui::End();
 	ImGui::PopStyleVar(1);

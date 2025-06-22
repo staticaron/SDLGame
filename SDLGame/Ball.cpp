@@ -7,6 +7,7 @@
 #include "imgui/imgui.h"
 
 #include "managers/config.h"
+#include "managers/AudioManager.h"
 
 
 Ball::Ball( EntityDetails details )
@@ -67,6 +68,7 @@ void Ball::MaintainBounds()
 	{
 		SetBoundPoint( TOPLEFT, { GetBoundPoint(TOPLEFT).x, Config::GetWindowPadding() });
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY * m_BoostWallCollisionDampening;
+		AudioManager::Get().PlaySound(5, 0);
 	}
 
 	if( GetBoundPoint(BOTTOMRIGHT).x > Config::GetWindowSize().x - Config::GetWindowPadding() )
@@ -74,12 +76,14 @@ void Ball::MaintainBounds()
 		SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint(BOTTOMRIGHT).y});
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
 		else if ( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
+		AudioManager::Get().PlaySound(5, 0);
 	}
 	else if( GetBoundPoint(TOPLEFT).x < Config::GetWindowPadding() )
 	{
 		SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint(TOPLEFT).y } );
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
 		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
+		AudioManager::Get().PlaySound(5, 0);
 	}
 }
 

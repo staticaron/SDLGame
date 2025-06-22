@@ -54,6 +54,8 @@ private:
 	bool m_IsGameOver = false;
 	bool m_IsExit = false;
 
+	int m_TimerYAdditive = -100;
+
 	TransitionState m_TransitionState = TransitionState::START;
 	bool m_IsTransitioning = true;
 	float m_TransitionTime = 1.0f;

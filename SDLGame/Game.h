@@ -50,10 +50,10 @@ private:
 
 	bool m_ShowImGui = false;
 
-	float m_MasterVolume = 0.5f;
-	float m_MasterSfxVolume = 0.5f;
+	float m_MasterMusicVolume = 1.0f;
+	float m_MasterSfxVolume = 1.0f;
 
-	GameState m_CurrentGameState = ABOUT;
+	GameState m_CurrentGameState = MAINMENU;
 
 	bool m_Quit = false;
 

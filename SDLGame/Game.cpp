@@ -44,7 +44,8 @@ Game::Game()
 	m_TextureManager.LoadAllTextures( m_Renderer );
 
 	AudioManager::Get().Init();
-	AudioManager::Get().PlayMusic( 0 );
+	AudioManager::Get().PlayMusic( Config::GetMusic() );
+	AudioManager::Get().LoadVolumes( &m_MasterMusicVolume, &m_MasterSfxVolume );
 
 	// initialize the starting level.
 	switch( m_CurrentGameState )
@@ -54,7 +55,9 @@ Game::Game()
 		case ABOUT:
 			m_AboutLevel = std::make_unique<About>(); break;
 		case LEVEL:
-			m_CurrentLevel = std::make_unique<Level>(); break;
+			m_CurrentLevel = std::make_unique<Level>();
+			m_CurrentLevel->InitColliders( m_TextureManager );
+			break;
 		default:
 			m_MainMenuLevel = std::make_unique<MainMenu>(); break;
 	}
@@ -180,11 +183,11 @@ void Game::RenderImGui()
 	if( !m_ShowImGui ) return;
 
 	ImGui::Begin( "Game Settings" );
-	ImGui::SliderFloat( "Music Volume", &m_MasterVolume, 0.0f, 1.0f );
+	ImGui::SliderFloat( "Music Volume", &m_MasterMusicVolume, 0.0f, 1.0f );
 	ImGui::SliderFloat( "SFX Volume ", &m_MasterSfxVolume, 0.0f, 1.0f );
 	if( ImGui::Button( "SET" ) )
 	{
-		AudioManager::Get().SetMusicVolume( m_MasterVolume );
+		AudioManager::Get().SetMusicVolume( m_MasterMusicVolume );
 		AudioManager::Get().SetSoundVolume( -1, m_MasterSfxVolume );
 	}
 	ImGui::InputDouble( "Delta Time", &m_DeltaTime );

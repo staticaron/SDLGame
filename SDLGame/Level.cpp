@@ -13,7 +13,7 @@
 
 Level::Level()
 	: m_EntityManager(
-		{ 2, 1000, glm::vec2( 70, 558 ), glm::vec2( 1.5, 1.5 ) },
+		{ 2, 1000, glm::vec2( 70, 578 ), glm::vec2( 1.5, 1.5 ) },
 		{ 0, 1000, glm::vec2( 300, 100 ), glm::vec2( 1, 1 ) },
 		{ 4, 0, glm::vec2(420, 50), glm::vec2(1, 1)}
 	), m_Camera( { 0, 0 }, { 1, 1 })
@@ -124,6 +124,7 @@ void Level::RenderImGui()
 	ImGui::BeginDisabled();
 	ImGui::InputFloat( "Timer Value", &m_CurrentTimer );
 	ImGui::EndDisabled();
+	ImGui::InputInt( "Timer Y Additive", &m_TimerYAdditive );
 	ImGui::End();
 
 	m_Camera.RenderImGui();
@@ -135,7 +136,7 @@ void Level::RenderImGui()
 void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
 {
 	SDL_Rect bgRect = { 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
-	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 0 ).GetTexture(), NULL, &bgRect);
+	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 3 ).GetTexture(), NULL, &bgRect);
 
 	m_EntityManager.GetBat().Render( renderer, textureManager );
 	m_EntityManager.GetBall().Render( renderer, textureManager );
@@ -199,11 +200,11 @@ void Level::RenderTimer( const FontManager& fontManager, SDL_Renderer* renderer 
 	m_CountDown = int( m_CurrentTimer );
 
 	std::string timerStr = std::to_string( int( m_CurrentTimer ) );
-	TextureContainer container = fontManager.GetTextureFromFont( renderer, 0, timerStr.c_str(), SDL_Color{ 200, 200, 200 } );
+	TextureContainer container = fontManager.GetTextureFromFont( renderer, 0, timerStr.c_str(), SDL_Color{ 107, 129, 142 } );
 
 	float xScale = 2;
 	float yScale = 2;
-	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - container.GetDimensions().x * xScale * 0.5f, Config::GetWindowSize().y * 0.5f - container.GetDimensions().y * yScale * 0.5f, container.GetDimensions().x * xScale, container.GetDimensions().y * yScale };
+	SDL_Rect timerRect = { Config::GetWindowSize().x * 0.5f - container.GetDimensions().x * xScale * 0.5f, Config::GetWindowSize().y * 0.5f - container.GetDimensions().y * yScale * 0.5f + m_TimerYAdditive, container.GetDimensions().x * xScale, container.GetDimensions().y * yScale };
 
 	SDL_RenderCopy( renderer, container.GetTexture(), NULL, &timerRect);
 

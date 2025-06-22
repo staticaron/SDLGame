@@ -23,7 +23,7 @@ class TransitionManager
 
 	private:
 	TransitionState m_TransitionState = TransitionState::NONE;
-	float m_TransitionTime = 1.0f;
+	float m_TransitionTime = .5f;
 	float m_CurrentTransitionTime = 0.0f;
 	bool m_IsTransitioning = true;
 

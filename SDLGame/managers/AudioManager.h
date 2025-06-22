@@ -24,6 +24,8 @@ class AudioManager
 	void PlaySound(int index, int times);
 	void PlayMusic(int index);
 
+	void LoadVolumes( float* musicVolume, float* soundVolume );
+	void SetAllSoundVolume(float);
 	void SetSoundVolume(int, float);
 	void SetMusicVolume(float);
 
@@ -35,4 +37,6 @@ class AudioManager
 
 	std::vector<Mix_Chunk*> m_SoundList;
 	std::vector<Mix_Music*> m_MusicList;
+
+	int m_MusicPlayingIndex = 0;
 };
