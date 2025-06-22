@@ -163,6 +163,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="include\glm\detail\glm.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_sdl2.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_sdlrenderer2.cpp" />

@@ -38,6 +38,9 @@ void Bat::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
 
 	const auto& tex = m_Expanded == false ? textureManager.GetTexture( m_EntityDetails.textureIndex ).GetTexture() : textureManager.GetTexture( m_EntityDetails.textureIndex + 1 ).GetTexture();
 
+	if ( m_BoostActive ) SDL_SetTextureColorMod(tex, 150, 150, 150);
+	else SDL_SetTextureColorMod( tex, 255, 255, 255 );
+
 	SDL_RenderCopy( renderer, tex, NULL, &rect );
 }
 

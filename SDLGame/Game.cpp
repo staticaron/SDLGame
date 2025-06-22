@@ -21,25 +21,43 @@ Game::Game()
 	m_Renderer = SDL_CreateRenderer( m_Window, -1, 0 );
 
 	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+	m_EditorUiContext = ImGui::CreateContext();
+	m_InGameUiContext = ImGui::CreateContext();
+
+	ImGui::SetCurrentContext( m_EditorUiContext );
 
 	ImGui::StyleColorsDark();
-
 	ImGui_ImplSDL2_InitForSDLRenderer( m_Window, m_Renderer );
 	ImGui_ImplSDLRenderer2_Init( m_Renderer );
-
 	SDL_SetRenderDrawColor( m_Renderer, 0, 0, 0, 255 );
+
+	ImGui::SetCurrentContext( m_InGameUiContext );
+
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForSDLRenderer( m_Window, m_Renderer );
+	ImGui_ImplSDLRenderer2_Init( m_Renderer );
+	SDL_SetRenderDrawColor( m_Renderer, 0, 0, 0, 255 );
+
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
 	m_TextureManager.LoadAllTextures( m_Renderer );
 
 	AudioManager::Get().Init();
 	AudioManager::Get().PlayMusic( 0 );
 
-	// m_CurrentLevel = std::make_unique<Level>();
-	m_MainMenuLevel = std::make_unique<MainMenu>();
-
-	// m_CurrentLevel->InitColliders( m_TextureManager );
+	// initialize the starting level.
+	switch( m_CurrentGameState )
+	{
+		case MAINMENU:
+			m_MainMenuLevel = std::make_unique<MainMenu>(); break;
+		case ABOUT:
+			m_AboutLevel = std::make_unique<About>(); break;
+		case LEVEL:
+			m_CurrentLevel = std::make_unique<Level>(); break;
+		default:
+			m_MainMenuLevel = std::make_unique<MainMenu>(); break;
+	}
 }
 
 Game::~Game()
@@ -66,6 +84,10 @@ void Game::Run()
 
 		while( SDL_PollEvent( &event ) )
 		{
+			ImGui::SetCurrentContext( m_EditorUiContext );
+			ImGui_ImplSDL2_ProcessEvent( &event );
+
+			ImGui::SetCurrentContext( m_InGameUiContext );
 			ImGui_ImplSDL2_ProcessEvent( &event );
 
 			if( event.type == SDL_QUIT )
@@ -87,11 +109,6 @@ void Game::Run()
 
 		HandleCollisions();
 
-		ImGui_ImplSDLRenderer2_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-
-		RenderImGui();
 		RenderEverything();
 	}
 }
@@ -188,19 +205,33 @@ void Game::RenderImGui()
 
 void Game::RenderEverything()
 {
-	ImGui::Render();
-
 	SDL_RenderClear( m_Renderer );
 
 	RenderGeometry();
 
+	ImGui::SetCurrentContext( m_InGameUiContext );
+	ImGui_ImplSDLRenderer2_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
 	RenderUI();
+
+	ImGui::Render();
+	ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
 
 	RenderTransitions();
 
+	ImGui::SetCurrentContext( m_EditorUiContext );
+	ImGui_ImplSDLRenderer2_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+
+	RenderImGui();
+
+	ImGui::Render();
 	ImGui_ImplSDLRenderer2_RenderDrawData( ImGui::GetDrawData(), m_Renderer );
 
-	SDL_RenderPresent( m_Renderer );
+	SDL_RenderPresent( m_Renderer );	
 }
 
 void Game::RenderUI()
@@ -208,11 +239,11 @@ void Game::RenderUI()
 	switch( m_CurrentGameState )
 	{
 	case MAINMENU:
-		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager ); break;
+		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
 	case ABOUT:
-		m_AboutLevel->RenderUI( m_Renderer, m_FontManager ); break;
+		m_AboutLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
 	case LEVEL:
-		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager ); break;
+		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
 	default:
 		break;
 	}

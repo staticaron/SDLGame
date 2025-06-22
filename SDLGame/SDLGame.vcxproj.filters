@@ -111,6 +111,9 @@
     <ClCompile Include="levels\About.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\SDL\begin_code.h">
@@ -1898,9 +1901,6 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\musics\bg.mp3" />
-    <Media Include="assets\sounds\hit.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
     <Media Include="assets\sounds\death.wav">
       <Filter>Resource Files</Filter>
     </Media>
@@ -1911,6 +1911,9 @@
       <Filter>Resource Files</Filter>
     </Media>
     <Media Include="assets\sounds\diamond.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\sounds\hit.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>

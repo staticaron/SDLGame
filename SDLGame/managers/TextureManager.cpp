@@ -36,6 +36,16 @@ void TextureManager::LoadAllTextures( SDL_Renderer* renderer )
 
 		m_Textures[x] = { tex, width, height };
 	}
+
+	for( int x = 0; x < m_LogoPaths.size(); x++ )
+	{
+		int width, height;
+		SDL_Texture* tex = IMG_LoadTexture( renderer, m_LogoPaths[x].c_str() );
+
+		SDL_QueryTexture( tex, NULL, NULL, &width, &height );
+
+		m_Logos[x] = { tex, width, height };
+	}
 }
 
 const TextureContainer& TextureManager::GetTexture( int index ) const
@@ -50,4 +60,11 @@ const TextureContainer& TextureManager::GetBackgroundTexture( int index ) const
 	SDL_assert( index >= 0 && index < m_BgTexturePaths.size() );
 
 	return m_BgTextures.at( index );
+}
+
+const TextureContainer& TextureManager::GetLogoTexture( int index ) const
+{
+	SDL_assert( index >= 0 && index < m_LogoPaths.size() );
+
+	return m_Logos.at( index );
 }

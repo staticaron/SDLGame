@@ -18,7 +18,14 @@ void AudioManager::Init()
 	LoadSound("assets/sounds/count.wav");
 	LoadSound("assets/sounds/countFinal.wav");
 	LoadSound("assets/sounds/diamond.wav");
+
 	LoadMusic("assets/musics/bg.ogg");
+	LoadMusic("assets/musics/Blaster.ogg");
+	LoadMusic("assets/musics/Groove.ogg");
+	LoadMusic("assets/musics/Space.ogg");
+	LoadMusic("assets/musics/Stellar.ogg");
+	LoadMusic("assets/musics/Victory.ogg");
+	LoadMusic("assets/musics/Whimsical.ogg");
 }
 
 AudioManager::AudioManager(){}

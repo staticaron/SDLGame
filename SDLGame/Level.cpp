@@ -142,7 +142,7 @@ void Level::Render( SDL_Renderer* renderer, const TextureManager& textureManager
 	m_EntityManager.GetDiamond().Render( renderer, textureManager );
 }
 
-void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
+void Level::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, const TextureManager& textureManager )
 {
 	RenderScore( fontManager, renderer );
 	RenderTimer( fontManager, renderer );

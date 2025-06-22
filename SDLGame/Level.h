@@ -5,6 +5,7 @@
 
 #include "Entity.h"
 #include "Camera.h"
+#include "levels/ILevel.h"
 #include "managers/TextureManager.h"
 #include "managers/FontManager.h"
 #include "managers/InputManager.h"
@@ -12,7 +13,7 @@
 #include "managers/ScoreManager.h"
 #include "managers/TransitionManager.h"
 
-class Level
+class Level : public ILevel
 {
 public:
 	Level();
@@ -25,10 +26,10 @@ public:
 	void HandleCollisions();
 	void Update( double, const InputManager& );
 
-	void Render( SDL_Renderer*, const TextureManager& );
-	void RenderUI( SDL_Renderer*, const FontManager& );
-	void RenderTransitions( SDL_Renderer*, const TextureManager& );
-	void RenderImGui();
+	void Render( SDL_Renderer*, const TextureManager& ) override;
+	void RenderUI( SDL_Renderer*, const FontManager&, const TextureManager& ) override;
+	void RenderTransitions( SDL_Renderer*, const TextureManager& ) override;
+	void RenderImGui() override;
 
 	void StartLevel();
 	void RestartLevel();

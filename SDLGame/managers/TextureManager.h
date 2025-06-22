@@ -44,6 +44,7 @@ class TextureManager
 
 	const TextureContainer& GetTexture(int index) const;
 	const TextureContainer& GetBackgroundTexture(int index) const;
+	const TextureContainer& GetLogoTexture(int index) const;
 
 	private:
 	std::vector<std::string> m_TexturePaths = {
@@ -60,6 +61,11 @@ class TextureManager
 		"assets/textures/transition.png"
 	};
 
+	std::vector<std::string> m_LogoPaths = {
+		"assets/textures/logos/sdl.png"
+	};
+
 	std::map<int, TextureContainer> m_Textures;
 	std::map<int, TextureContainer> m_BgTextures; 
+	std::map<int, TextureContainer> m_Logos;
 };

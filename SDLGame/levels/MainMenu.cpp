@@ -58,7 +58,7 @@ void MainMenu::Render( SDL_Renderer* renderer, const TextureManager& textureMana
 	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 1 ).GetTexture(), NULL, &bgRect );
 }
 
-void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager )
+void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, const TextureManager& textureManager )
 {
 	for( int x = 0; x < m_Buttons.size(); x++ )
 	{

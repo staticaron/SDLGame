@@ -45,11 +45,11 @@ public:
 	MainMenu();
 	~MainMenu();
 
-	void Update( double, const InputManager& );
-	void Render( SDL_Renderer*, const TextureManager& );
-	void RenderUI( SDL_Renderer*, const FontManager& );
-	void RenderTransitions( SDL_Renderer*, const TextureManager& );
-	void RenderImGui(); 
+	void Update( double, const InputManager& ) override;
+	void Render( SDL_Renderer*, const TextureManager& ) override;
+	void RenderUI( SDL_Renderer*, const FontManager&, const TextureManager& ) override;
+	void RenderTransitions( SDL_Renderer*, const TextureManager& ) override;
+	void RenderImGui() override; 
 
 	void Unload();
 

@@ -37,6 +37,9 @@ private:
 	InputManager m_InputManager;
 	ScoreManager m_ScoreManager;
 
+	ImGuiContext* m_InGameUiContext;
+	ImGuiContext* m_EditorUiContext;
+
 	std::unique_ptr<MainMenu> m_MainMenuLevel = NULL;
 	std::unique_ptr<Level> m_CurrentLevel = NULL;
 	std::unique_ptr<About> m_AboutLevel = NULL;
@@ -50,7 +53,7 @@ private:
 	float m_MasterVolume = 0.5f;
 	float m_MasterSfxVolume = 0.5f;
 
-	GameState m_CurrentGameState = MAINMENU;
+	GameState m_CurrentGameState = ABOUT;
 
 	bool m_Quit = false;
 
