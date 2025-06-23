@@ -59,7 +59,8 @@ class TextureManager
 		"assets/textures/bg.png",
 		"assets/textures/mainmenu.png",
 		"assets/textures/transition.png",
-		"assets/textures/bg2.png"
+		"assets/textures/bg2.png",
+		"assets/textures/about.png"
 	};
 
 	std::vector<std::string> m_LogoPaths = {

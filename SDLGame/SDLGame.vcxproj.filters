@@ -1860,7 +1860,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="imgui.ini" />
-    <None Include="config.ini" />
     <None Include="assets\musics\bg.ogg" />
     <None Include="lib\x64\SDL2_image.pdb" />
     <None Include="lib\x64\SDL2_mixer.dll" />
@@ -1872,6 +1871,7 @@
     <None Include="lib\x86\SDL2_mixer.pdb" />
     <None Include="lib\x86\SDL2_ttf.pdb" />
     <None Include="lib\x86\SDL2.pdb" />
+    <None Include="config.ini" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="textures\tex1.png">

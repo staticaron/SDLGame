@@ -68,6 +68,8 @@ public:
 private:
 	std::map<int, MainMenuButton> m_Buttons;
 
+	int m_MenuYAdditive = 45;
+
 	TransitionManager m_TransitionManager;
 
 	MainMenuAction m_ActionTaken = MainMenuAction::NONE;

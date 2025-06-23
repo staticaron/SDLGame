@@ -64,7 +64,7 @@ void MainMenu::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager,
 	{
 		TextureContainer btnContainer = fontManager.GetTextureFromFont( renderer, 0, m_Buttons.at( x ).text.c_str(), m_Buttons.at( x ).currentState == ButtonState::HOVERED ? m_HoverColor : m_NormalColor );
 
-		float startY = Config::GetWindowSize().y * 0.5f - m_Buttons.size() * btnContainer.GetDimensions().y * 0.5f;
+		float startY = Config::GetWindowSize().y * 0.5f - m_Buttons.size() * btnContainer.GetDimensions().y * 0.5f + m_MenuYAdditive;
 		SDL_Rect fontRect = { Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - btnContainer.GetDimensions().x * 0.5f, startY + x * btnContainer.GetDimensions().y, btnContainer.GetDimensions().x, btnContainer.GetDimensions().y };
 		m_Buttons[x].dimensions = fontRect;
 
@@ -79,7 +79,12 @@ void MainMenu::RenderTransitions( SDL_Renderer* renderer, const TextureManager& 
 	m_TransitionManager.RenderTransitions( renderer, textureManager );
 }
 
-void MainMenu::RenderImGui() {}
+void MainMenu::RenderImGui()
+{
+	ImGui::Begin( "Main Menu Settings" );
+	ImGui::InputInt("Menu Y Additive", &m_MenuYAdditive );
+	ImGui::End();
+}
 
 void MainMenu::Unload()
 {

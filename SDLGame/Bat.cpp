@@ -46,8 +46,6 @@ void Bat::Render( SDL_Renderer* renderer, const TextureManager& textureManager )
 
 void Bat::RenderImGui()
 {
-	Entity::RenderImGui();
-
 	std::string windowTitle = "Bat Settings";
 
 	ImGui::Begin(windowTitle.c_str());;

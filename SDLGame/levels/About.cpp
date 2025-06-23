@@ -32,27 +32,22 @@ void About::Update( double deltaTime, const InputManager& inputManager )
 void About::Render( SDL_Renderer* renderer, const TextureManager& textureManager ) 
 {
 	auto bgRect = SDL_Rect{ 0, 0, Config::GetWindowSize().x, Config::GetWindowSize().y };
-	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 1 ).GetTexture(), NULL, &bgRect);
+	SDL_RenderCopy( renderer, textureManager.GetBackgroundTexture( 4 ).GetTexture(), NULL, &bgRect);
 }
 
 void About::RenderImGui() 
 {
 	ImGui::Begin( "About Settings" );
-	ImGui::InputInt( "Button Width Additive", &m_ButtonWidthAdditive );
+	ImGui::InputInt( "Buttons Width Additive", &m_ButtonWidthAdditive );
+	ImGui::InputInt( "Buttons X Additive", &m_ButtonXAdditive );
+	ImGui::InputInt( "Buttons Y Additive", &m_ButtonYAdditive );
+	ImGui::InputInt( "About Header Y Additive", &m_AboutHeaderYAdditive );
 	ImGui::End();
 }
 
 void About::RenderUI( SDL_Renderer* renderer, const FontManager& fontManager, const TextureManager& textureManager)
 {
-	std::string aboutHeading = "ABOUT";
-	auto headingTex = fontManager.GetTextureFromFont( renderer, 0, aboutHeading.c_str(), m_NormalColor );
-	auto headingRect = SDL_Rect( Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - headingTex.GetDimensions().x * 0.5f, 50, headingTex.GetDimensions().x, headingTex.GetDimensions().y );
-
-	SDL_RenderCopy( renderer, headingTex.GetTexture(), NULL, &headingRect );
-
-	headingTex.Destroy();
-
-	ImGui::SetNextWindowPos( ImVec2( Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - m_MainDimensions.x * 0.5f, Config::GetWindowSize().y * 0.5f - Config::GetWindowPadding() - m_MainDimensions.y * 0.5f ), ImGuiCond_Always );
+	ImGui::SetNextWindowPos( ImVec2( Config::GetWindowSize().x * 0.5f - Config::GetWindowPadding() - m_MainDimensions.x * 0.5f + m_ButtonXAdditive, Config::GetWindowSize().y * 0.5f - Config::GetWindowPadding() - m_MainDimensions.y * 0.5f + m_ButtonYAdditive ), ImGuiCond_Always );
 	ImGui::SetNextWindowSize( ImVec2( m_MainDimensions.x, m_MainDimensions.y ) );
 	ImGui::SetNextWindowBgAlpha( 0.0f );
 

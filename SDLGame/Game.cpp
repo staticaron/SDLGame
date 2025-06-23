@@ -17,7 +17,7 @@ Game::Game()
 		return;
 	}
 
-	m_Window = SDL_CreateWindow( "SDL!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Config::GetWindowSize().x, Config::GetWindowSize().y, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI );
+	m_Window = SDL_CreateWindow( "Bounze v0.1", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Config::GetWindowSize().x, Config::GetWindowSize().y, SDL_WindowFlags::SDL_WINDOW_ALLOW_HIGHDPI );
 	m_Renderer = SDL_CreateRenderer( m_Window, -1, 0 );
 
 	IMGUI_CHECKVERSION();
@@ -196,7 +196,7 @@ void Game::RenderImGui()
 	switch( m_CurrentGameState )
 	{
 	case MAINMENU:
-		m_MainMenuLevel->RenderImGui( m_Renderer ); break;
+		m_MainMenuLevel->RenderImGui(); break;
 	case ABOUT:
 		m_AboutLevel->RenderImGui(); break;
 	case LEVEL:

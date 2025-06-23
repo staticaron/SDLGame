@@ -1,6 +1,7 @@
 #include "config.h"
 
 #include <string>
+#include <filesystem>
 
 glm::vec2 Config::m_WindowSize;
 int Config::m_WindowPadding;

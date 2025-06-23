@@ -29,7 +29,7 @@ class AudioManager
 	void SetSoundVolume(int, float);
 	void SetMusicVolume(float);
 
-	int GetMusicCount() const { return m_MusicList.size(); };
+	size_t GetMusicCount() const { return m_MusicList.size(); };
 
 	private:
 	AudioManager();
