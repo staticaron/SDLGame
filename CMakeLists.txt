@@ -38,8 +38,8 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/
 
 add_executable("${PROJECT_NAME}" "${MY_SOURCES}")
 
-target_compile_definitions("${PROJECT_NAME}" PUBLIC RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
-# target_compile_definitions("${PROJECT_NAME}" PUBLIC RESOURCE_PATH="./resources")
+# target_compile_definitions("${PROJECT_NAME}" PUBLIC RESOURCE_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
+target_compile_definitions("${PROJECT_NAME}" PUBLIC RESOURCE_PATH="./resources/")
 
 target_compile_definitions("${PROJECT_NAME}" PRIVATE SDL_MAIN_HANDLED)
 

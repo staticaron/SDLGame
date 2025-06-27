@@ -48,7 +48,7 @@ void Config::UpdateMusic( int musicIndex )
 {
 	if( musicIndex == m_MusicIndex ) return;
 
-	mINI::INIFile file( "config.ini" );
+	mINI::INIFile file( RESOURCE_PATH "config.ini" );
 
 	mINI::INIStructure ini;
 
@@ -64,7 +64,7 @@ void Config::UpdateVolume( int musicVolume = -1, int soundVolume = -1 )
 {
 	if( musicVolume == m_MusicVolume && soundVolume == m_SoundVolume ) return;
 
-	mINI::INIFile file( "config.ini" );
+	mINI::INIFile file( RESOURCE_PATH "config.ini" );
 
 	mINI::INIStructure ini;
 
