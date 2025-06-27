@@ -1,5 +1,3 @@
-#include <SDL.h>
-
 #include "Game.h"
 
 int main( int argumentCount, char* arguments[] )

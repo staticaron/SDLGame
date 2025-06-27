@@ -4,8 +4,8 @@
 
 #include "glm.hpp"
 
-#include "managers/config.h"
 #include "managers/AudioManager.h"
+#include "managers/config.h"
 
 Game::Game()
 {
@@ -50,11 +50,11 @@ Game::Game()
 	// initialize the starting level.
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel = std::make_unique<MainMenu>(); break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel = std::make_unique<About>(); break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel = std::make_unique<Level>();
 		m_CurrentLevel->InitColliders( m_TextureManager );
 		break;
@@ -65,6 +65,7 @@ Game::Game()
 
 Game::~Game()
 {
+	SDL_DestroyWindow( m_Window );
 	SDL_DestroyRenderer( m_Renderer );
 }
 
@@ -120,32 +121,32 @@ bool Game::Update( double deltaTime )
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel->Update( deltaTime, m_InputManager );
 
 		if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::QUIT ) m_Quit = true;
 		else if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::STARTGAME )
 		{
-			ChangeGameState( LEVEL );
+			ChangeGameState( GameState::LEVEL );
 			return false;
 		}
 		else if( m_MainMenuLevel->GetMainMenuAction() == MainMenuAction::ABOUT )
 		{
-			ChangeGameState( ABOUT );
+			ChangeGameState( GameState::ABOUT );
 			return false;
 		}
 		break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel->Update( deltaTime, m_InputManager );
 
 		if( m_AboutLevel->GetAction() == AboutAction::MAINMENU )
 		{
-			ChangeGameState( MAINMENU );
+			ChangeGameState( GameState::MAINMENU );
 			return false;
 		}
 
 		break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel->Update( deltaTime, m_InputManager );
 		if( m_CurrentLevel->IsGameOver() )
 		{
@@ -154,7 +155,7 @@ bool Game::Update( double deltaTime )
 		}
 		if( m_CurrentLevel->IsExit() )
 		{
-			ChangeGameState( MAINMENU );
+			ChangeGameState( GameState::MAINMENU );
 			return false;
 		}
 		break;
@@ -169,9 +170,9 @@ void Game::HandleCollisions()
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU: break;
-	case ABOUT: break;
-	case LEVEL:
+	case GameState::MAINMENU: break;
+	case GameState::ABOUT: break;
+	case GameState::LEVEL:
 		m_CurrentLevel->HandleCollisions(); break;
 	default:
 		break;
@@ -195,11 +196,11 @@ void Game::RenderImGui()
 
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel->RenderImGui(); break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel->RenderImGui(); break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel->RenderImGui(); break;
 	default:
 		break;
@@ -241,11 +242,11 @@ void Game::RenderUI()
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel->RenderUI( m_Renderer, m_FontManager, m_TextureManager ); break;
 	default:
 		break;
@@ -256,11 +257,11 @@ void Game::RenderTransitions()
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel->RenderTransitions( m_Renderer, m_TextureManager ); break;
 	default:
 		break;
@@ -271,11 +272,11 @@ void Game::RenderGeometry()
 {
 	switch( m_CurrentGameState )
 	{
-	case MAINMENU:
+	case GameState::MAINMENU:
 		m_MainMenuLevel->Render( m_Renderer, m_TextureManager ); break;
-	case ABOUT:
+	case GameState::ABOUT:
 		m_AboutLevel->Render( m_Renderer, m_TextureManager ); break;
-	case LEVEL:
+	case GameState::LEVEL:
 		m_CurrentLevel->Render( m_Renderer, m_TextureManager ); break;
 	default:
 		break;
@@ -286,29 +287,29 @@ void Game::ChangeGameState( GameState gameStateToChangeTo )
 {
 	if( m_CurrentGameState == gameStateToChangeTo ) return;
 
-	if( gameStateToChangeTo == LEVEL )
+	if( gameStateToChangeTo == GameState::LEVEL )
 	{
 		if( m_MainMenuLevel != NULL ) m_MainMenuLevel->Unload();
 		if( m_AboutLevel != NULL ) m_AboutLevel->Unload();
 
 		m_CurrentLevel = std::make_unique<Level>();
 		m_CurrentLevel->InitColliders( m_TextureManager );
-		m_CurrentGameState = LEVEL;
+		m_CurrentGameState = GameState::LEVEL;
 	}
-	else if( gameStateToChangeTo == MAINMENU )
+	else if( gameStateToChangeTo == GameState::MAINMENU )
 	{
 		if( m_CurrentLevel != NULL ) m_CurrentLevel->Unload();
 		if( m_AboutLevel != NULL ) m_AboutLevel->Unload();
 
 		m_MainMenuLevel = std::make_unique<MainMenu>();
-		m_CurrentGameState = MAINMENU;
+		m_CurrentGameState = GameState::MAINMENU;
 	}
-	else if( gameStateToChangeTo == ABOUT )
+	else if( gameStateToChangeTo == GameState::ABOUT )
 	{
-		if( m_CurrentGameState != NULL ) m_CurrentLevel->Unload();
+		if( m_CurrentLevel != NULL ) m_CurrentLevel->Unload();
 		if( m_MainMenuLevel != NULL ) m_MainMenuLevel->Unload();
 
 		m_AboutLevel = std::make_unique<About>();
-		m_CurrentGameState = ABOUT;
+		m_CurrentGameState = GameState::ABOUT;
 	}
 }

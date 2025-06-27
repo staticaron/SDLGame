@@ -59,28 +59,28 @@ void Ball::ResolveCollision( const Entity& entity )
 
 void Ball::MaintainBounds()
 {
-	if( GetBoundPoint( BOTTOMRIGHT ).y > Config::GetWindowSize().y - Config::GetWindowPadding() )
+	if( GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y > Config::GetWindowSize().y - Config::GetWindowPadding() )
 	{
-		SetBoundPoint( BOTTOMRIGHT, { GetBoundPoint( BOTTOMRIGHT ).x, Config::GetWindowSize().y - Config::GetWindowPadding() } );
+		SetBoundPoint( BoundPointType::BOTTOMRIGHT, { GetBoundPoint( BoundPointType::BOTTOMRIGHT ).x, Config::GetWindowSize().y - Config::GetWindowPadding() } );
 		m_VelocityY = 0;
 	}
-	else if( GetBoundPoint( TOPLEFT ).y < Config::GetWindowPadding() )
+	else if( GetBoundPoint( BoundPointType::TOPLEFT ).y < Config::GetWindowPadding() )
 	{
-		SetBoundPoint( TOPLEFT, { GetBoundPoint( TOPLEFT ).x, Config::GetWindowPadding() } );
+		SetBoundPoint( BoundPointType::TOPLEFT, { GetBoundPoint( BoundPointType::TOPLEFT ).x, Config::GetWindowPadding() } );
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityY = -m_VelocityY * m_BoostWallCollisionDampening;
 		AudioManager::Get().PlaySound( 5, 0 );
 	}
 
-	if( GetBoundPoint( BOTTOMRIGHT ).x > Config::GetWindowSize().x - Config::GetWindowPadding() )
+	if( GetBoundPoint( BoundPointType::BOTTOMRIGHT ).x > Config::GetWindowSize().x - Config::GetWindowPadding() )
 	{
-		SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint( BOTTOMRIGHT ).y } );
+		SetBoundPoint( BoundPointType::BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y } );
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
 		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
 		AudioManager::Get().PlaySound( 5, 0 );
 	}
-	else if( GetBoundPoint( TOPLEFT ).x < Config::GetWindowPadding() )
+	else if( GetBoundPoint( BoundPointType::TOPLEFT ).x < Config::GetWindowPadding() )
 	{
-		SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint( TOPLEFT ).y } );
+		SetBoundPoint( BoundPointType::TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint( BoundPointType::TOPLEFT ).y } );
 		if( m_CurrentBallState == BallState::BOOST ) m_VelocityX = -m_VelocityX * m_BoostWallCollisionDampening;
 		else if( m_CurrentBallState == BallState::BOUNCE ) m_VelocityX = -m_VelocityX * m_BounceWallCollisionDampening;
 		AudioManager::Get().PlaySound( 5, 0 );
@@ -124,12 +124,12 @@ void Ball::RandomBounce()
 	if( m_CollisionAndOverlap.IsColliding() )
 	{
 		// If touching the walls, push the ball slightly to the opposite direction.
-		if( GetBoundPoint( BOTTOMLEFT ).x <= Config::GetWindowPadding() )
+		if( GetBoundPoint( BoundPointType::BOTTOMLEFT ).x <= Config::GetWindowPadding() )
 		{
 			minRange = 0;
 			maxRange = 30;
 		}
-		else if( GetBoundPoint( BOTTOMRIGHT ).x >= Config::GetWindowSize().x - Config::GetWindowPadding() )
+		else if( GetBoundPoint( BoundPointType::BOTTOMRIGHT ).x >= Config::GetWindowSize().x - Config::GetWindowPadding() )
 		{
 			minRange = -30;
 			maxRange = 0;

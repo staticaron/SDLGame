@@ -13,7 +13,7 @@
 #include "managers/ScoreManager.h"
 #include "managers/TextureManager.h"
 
-enum GameState
+enum class GameState
 {
 	MAINMENU,
 	ABOUT,
@@ -53,7 +53,7 @@ private:
 	float m_MasterMusicVolume = 1.0f;
 	float m_MasterSfxVolume = 1.0f;
 
-	GameState m_CurrentGameState = MAINMENU;
+	GameState m_CurrentGameState = GameState::MAINMENU;
 
 	bool m_Quit = false;
 

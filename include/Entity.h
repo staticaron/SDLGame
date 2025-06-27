@@ -43,7 +43,7 @@ struct AxisOverlap
 	bool IsColliding() { return xOverlap && yOverlap; }
 };
 
-enum BoundPointType
+enum class BoundPointType
 {
 	TOPLEFT,
 	TOPRIGHT,

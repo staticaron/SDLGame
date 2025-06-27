@@ -43,8 +43,8 @@ void Entity::RenderImGui()
 {
 	if( m_ShowBounds )
 	{
-		auto min = GetBoundPoint( TOPLEFT );
-		auto max = GetBoundPoint( BOTTOMRIGHT );
+		auto min = GetBoundPoint( BoundPointType::TOPLEFT );
+		auto max = GetBoundPoint( BoundPointType::BOTTOMRIGHT );
 		auto middle = GetCenter();
 
 		ImGui::GetForegroundDrawList()->AddRect( { min.x, min.y }, { max.x, max.y }, IM_COL32( 255, 0, 0, 255 ), 0, 0, 2.0f );
@@ -75,8 +75,8 @@ AxisOverlap Entity::DetectCollision( const Entity& entity )
 {
 	AxisOverlap overlap;
 
-	overlap.xOverlap = !(GetBoundPoint( TOPRIGHT ).x < entity.GetBoundPoint( TOPLEFT ).x) && !(GetBoundPoint( TOPLEFT ).x > entity.GetBoundPoint( TOPRIGHT ).x);
-	overlap.yOverlap = !(GetBoundPoint( TOPRIGHT ).y > entity.GetBoundPoint( BOTTOMRIGHT ).y) && !(GetBoundPoint( BOTTOMRIGHT ).y < entity.GetBoundPoint( TOPRIGHT ).y);
+	overlap.xOverlap = !(GetBoundPoint( BoundPointType::TOPRIGHT ).x < entity.GetBoundPoint( BoundPointType::TOPLEFT ).x) && !(GetBoundPoint( BoundPointType::TOPLEFT ).x > entity.GetBoundPoint( BoundPointType::TOPRIGHT ).x);
+	overlap.yOverlap = !(GetBoundPoint( BoundPointType::TOPRIGHT ).y > entity.GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y) && !(GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y < entity.GetBoundPoint( BoundPointType::TOPRIGHT ).y);
 
 	if( overlap.IsColliding() )
 	{
@@ -102,7 +102,7 @@ void Entity::ResetDetails()
 
 void Entity::GroundCheck()
 {
-	m_IsGrounded = GetBoundPoint( BOTTOMRIGHT ).y >= Config::GetWindowSize().y - Config::GetWindowPadding();
+	m_IsGrounded = GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y >= Config::GetWindowSize().y - Config::GetWindowPadding();
 }
 
 std::array<glm::vec2, 4> Entity::GetBoundPoints() const
@@ -118,7 +118,7 @@ std::array<glm::vec2, 4> Entity::GetBoundPoints() const
 
 glm::vec2 Entity::GetBoundPoint( BoundPointType type ) const
 {
-	return glm::vec2( m_EntityDetails.pos.x + (type == TOPRIGHT || type == BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().x, m_EntityDetails.pos.y + (type == BOTTOMLEFT || type == BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().y );
+	return glm::vec2( m_EntityDetails.pos.x + (type == BoundPointType::TOPRIGHT || type == BoundPointType::BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().x, m_EntityDetails.pos.y + (type == BoundPointType::BOTTOMLEFT || type == BoundPointType::BOTTOMRIGHT ? 1 : -1) * m_EntityBounds.GetHalfBounds().y );
 }
 
 glm::vec2 Entity::GetCenter() const
@@ -129,6 +129,6 @@ glm::vec2 Entity::GetCenter() const
 
 void Entity::SetBoundPoint( BoundPointType type, glm::vec2 pos )
 {
-	m_EntityDetails.pos.x = pos.x + (type == TOPLEFT || type == BOTTOMLEFT ? 1 : -1) * GetBoundDetails().GetHalfBounds().x;
-	m_EntityDetails.pos.y = pos.y + (type == BOTTOMLEFT || type == BOTTOMRIGHT ? -1 : 1) * GetBoundDetails().GetHalfBounds().y;
+	m_EntityDetails.pos.x = pos.x + (type == BoundPointType::TOPLEFT || type == BoundPointType::BOTTOMLEFT ? 1 : -1) * GetBoundDetails().GetHalfBounds().x;
+	m_EntityDetails.pos.y = pos.y + (type == BoundPointType::BOTTOMLEFT || type == BoundPointType::BOTTOMRIGHT ? -1 : 1) * GetBoundDetails().GetHalfBounds().y;
 }

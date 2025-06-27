@@ -83,6 +83,6 @@ void Bat::DisableExpansion()
 
 void Bat::MaintainBounds()
 {
-	if( GetBoundPoint( TOPLEFT ).x < Config::GetWindowPadding() ) SetBoundPoint( TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint( TOPLEFT ).y } );
-	if( GetBoundPoint( BOTTOMRIGHT ).x > Config::GetWindowSize().x - Config::GetWindowPadding() ) SetBoundPoint( BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint( BOTTOMRIGHT ).y } );
+	if( GetBoundPoint( BoundPointType::TOPLEFT ).x < Config::GetWindowPadding() ) SetBoundPoint( BoundPointType::TOPLEFT, { Config::GetWindowPadding(), GetBoundPoint( BoundPointType::TOPLEFT ).y } );
+	if( GetBoundPoint( BoundPointType::BOTTOMRIGHT ).x > Config::GetWindowSize().x - Config::GetWindowPadding() ) SetBoundPoint( BoundPointType::BOTTOMRIGHT, { Config::GetWindowSize().x - Config::GetWindowPadding(), GetBoundPoint( BoundPointType::BOTTOMRIGHT ).y } );
 }

@@ -156,6 +156,10 @@ void Level::RenderTransitions( SDL_Renderer* renderer, const TextureManager& tex
 	m_TransitionManager.RenderTransitions( renderer, textureManager );
 }
 
+void Level::StartLevel()
+{
+}
+
 void Level::RestartLevel()
 {
 	m_IsGameOver = false;
