@@ -14,9 +14,10 @@
 ## How to build. 
 ### Windows + Visual Studio
 1. Open the folder in visual studio as Cmake Project.
-2. Build `bounze.exe`.
+2. `Ctrl + S` on the CMakeLists.txt file to build the project.
+3. Run `bounze.exe`.
 
-**NOTE** : Copy the `/resouces` folder in same directory as the `.exe` file. 
+**NOTE** : Copy the `/resources` folder in same directory as the `.exe` file. 
 
 ### LINUX
 1. Create a folder `/build`
@@ -24,4 +25,4 @@
 3. Run the cmake command `cmake ..`
 4. Make the build file `make`
    
-**NOTE** : Copy the `/resouces` folder in same directory as the `.exe` file. 
+**NOTE** : Copy the `/resources` folder in same directory as the `.exe` file. 
